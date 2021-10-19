@@ -1,0 +1,32 @@
+services:
+  # default configuration for services in *this* file
+  _defaults:
+    autowire: true
+    autoconfigure: true
+
+  treblle-client:
+    class: GuzzleHttp\Client
+
+  Treblle\Treblle:
+    factory: [ Treblle\Symfony\DependencyInjection\TreblleFactory, 'createTreblle' ]
+    arguments:
+      $client: '@treblle-client'
+
+  Treblle\PayloadAnonymizer:
+    factory: [ Treblle\Symfony\DependencyInjection\TreblleFactory, 'createAnonymizer' ]
+
+  Treblle\Symfony\DataProvider\RequestDataProvider: ~
+  Treblle\Symfony\DataProvider\ResponseDataProvider: ~
+  Treblle\InMemoryErrorDataProvider: ~
+  Treblle\PhpHelper: ~
+  Treblle\PhpLanguageDataProvider: ~
+  Treblle\SuperglobalsServerDataProvider: ~
+
+  Treblle\Contract\ErrorDataProvider: '@Treblle\InMemoryErrorDataProvider'
+  Treblle\Contract\LanguageDataProvider: '@Treblle\PhpLanguageDataProvider'
+  Treblle\Contract\RequestDataProvider: '@Treblle\Symfony\DataProvider\RequestDataProvider'
+  Treblle\Contract\ResponseDataProvider: '@Treblle\Symfony\DataProvider\ResponseDataProvider'
+  Treblle\Contract\ServerDataProvider: '@Treblle\SuperglobalsServerDataProvider'
+
+  Treblle\Symfony\EventSubscriber\TreblleEventSubscriber: ~
+
