@@ -6,6 +6,7 @@ namespace Tests\Treblle\Symfony;
 
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\NullLogger;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
@@ -33,14 +34,14 @@ final class TreblleEventSubscriberTest extends TestCase
         parent::setUp();
 
         $this->treblle = $this->createMock(Treblle::class);
-        $this->subjectUnderTest = new TreblleEventSubscriber($this->treblle);
+        $this->subjectUnderTest = new TreblleEventSubscriber($this->treblle, new NullLogger());
     }
 
     public function test_it_is_subscribed_to_correct_events(): void
     {
         $events = TreblleEventSubscriber::getSubscribedEvents();
         $events = array_keys($events);
-        $this->assertSame([KernelEvents::EXCEPTION, KernelEvents::TERMINATE], $events);
+        $this->assertEquals([KernelEvents::TERMINATE, KernelEvents::EXCEPTION], $events);
     }
 
     public function test_it_calls_on_shutdown_on_kernel_terminate(): void

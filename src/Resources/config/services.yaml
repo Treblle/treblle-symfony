@@ -15,8 +15,8 @@ services:
   Treblle\PayloadAnonymizer:
     factory: [ Treblle\Symfony\DependencyInjection\TreblleFactory, 'createAnonymizer' ]
 
-  Treblle\Symfony\DataProvider\RequestDataProvider: ~
-  Treblle\Symfony\DataProvider\ResponseDataProvider: ~
+  Treblle\Symfony\DataProvider: ~
+  Treblle\Symfony\EventSubscriber\TreblleEventSubscriber: ~
   Treblle\InMemoryErrorDataProvider: ~
   Treblle\PhpHelper: ~
   Treblle\PhpLanguageDataProvider: ~
@@ -24,9 +24,6 @@ services:
 
   Treblle\Contract\ErrorDataProvider: '@Treblle\InMemoryErrorDataProvider'
   Treblle\Contract\LanguageDataProvider: '@Treblle\PhpLanguageDataProvider'
-  Treblle\Contract\RequestDataProvider: '@Treblle\Symfony\DataProvider\RequestDataProvider'
-  Treblle\Contract\ResponseDataProvider: '@Treblle\Symfony\DataProvider\ResponseDataProvider'
+  Treblle\Contract\RequestDataProvider: '@Treblle\Symfony\DataProvider'
+  Treblle\Contract\ResponseDataProvider: '@Treblle\Symfony\DataProvider'
   Treblle\Contract\ServerDataProvider: '@Treblle\SuperglobalsServerDataProvider'
-
-  Treblle\Symfony\EventSubscriber\TreblleEventSubscriber: ~
-

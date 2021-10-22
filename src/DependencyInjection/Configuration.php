@@ -13,6 +13,7 @@ final class Configuration implements ConfigurationInterface
     {
         $treeBuilder = new TreeBuilder('treblle');
 
+        // @phpstan-ignore-next-line
         $treeBuilder->getRootNode()
             ->children()
             ->scalarNode('endpoint_url')->defaultValue('https://rocknrolla.treblle.com')->end()

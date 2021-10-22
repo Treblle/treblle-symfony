@@ -9,9 +9,15 @@ class TreblleConfiguration
     private string $apiKey;
     private string $projectId;
     private string $endpointUrl;
+    /**
+     * @var list<string>
+     */
     private array $masked;
     private bool $debug;
 
+    /**
+     * @param list<string> $masked
+     */
     public function __construct(string $apiKey, string $projectId, string $endpointUrl, array $masked, bool $debug)
     {
         $this->apiKey = $apiKey;
@@ -36,6 +42,9 @@ class TreblleConfiguration
         return $this->endpointUrl;
     }
 
+    /**
+     * @return list<string>
+     */
     public function getMasked(): array
     {
         return $this->masked;
