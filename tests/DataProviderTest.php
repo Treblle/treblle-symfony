@@ -59,7 +59,8 @@ final class DataProviderTest extends TestCase
         $event->expects($this->once())->method('getRequest')->willReturn(new Request());
 
         $this->subjectUnderTest->onKernelRequest($event);
-        $this->subjectUnderTest->getRequest();
+        $request = $this->subjectUnderTest->getRequest();
+        $this->assertInstanceOf(\Treblle\Model\Request::class, $request);
     }
 
     public function test_it_builds_response_correctly(): void
@@ -72,6 +73,7 @@ final class DataProviderTest extends TestCase
         );
 
         $this->subjectUnderTest->onKernelResponse($event);
-        $this->subjectUnderTest->getResponse();
+        $response = $this->subjectUnderTest->getResponse();
+        $this->assertInstanceOf(\Treblle\Model\Response::class, $response);
     }
 }

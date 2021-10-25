@@ -1,6 +1,6 @@
 # Treblle-symfony
 
-Symfony integration for [Treble](https://treblle.com/).
+Symfony integration for [Treblle](https://treblle.com/).
 
 @todo badges
 

@@ -88,8 +88,7 @@
       "@lint",
       "@code-style:check",
       "@phpstan",
-      "@rector:check",
-      "@security:check"
+      "@rector:check"
     ],
     "phpunit": [
       "phpunit --configuration='./tools/phpunit/config.xml' --colors --do-not-cache-result"

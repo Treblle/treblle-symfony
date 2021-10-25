@@ -18,6 +18,7 @@ use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Event\KernelEvent;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Treblle\Contract\LanguageDataProvider;
 use Treblle\Contract\ServerDataProvider;
 use Treblle\InMemoryErrorDataProvider;
@@ -307,15 +308,15 @@ final class TreblleIntegrationTest extends TestCase
                             'source' => 'onException',
                             'type' => 'UNHANDLED_EXCEPTION',
                             'message' => 'message',
-                            'file' => '/Users/zoka123/Workspace/treblle-symfony/tests/TreblleIntegrationTest.php',
-                            'line' => 235,
+                            'file' => __FILE__,
+                            'line' => 236,
                         ],
                         [
                             'source' => 'onException',
                             'type' => 'UNHANDLED_EXCEPTION',
                             'message' => 'UNHANDLED_EXCEPTION',
-                            'file' => '/Users/zoka123/Workspace/treblle-symfony/tests/TreblleIntegrationTest.php',
-                            'line' => 240,
+                            'file' => __FILE__,
+                            'line' => 241,
                         ],
                     ],
                 ],
@@ -340,18 +341,27 @@ final class TreblleIntegrationTest extends TestCase
         $this->languageDataProvider->expects($this->once())
             ->method('getLanguage')
             ->willReturn($language);
+
         $requestEvent = $this->createMock(RequestEvent::class);
         $requestEvent->expects($this->once())->method('isMasterRequest')->willReturn(true);
         $requestEvent->expects($this->once())->method('getRequest')->willReturn($httpRequest);
         $this->dataProvider->onKernelRequest($requestEvent);
 
-        $responseEvent = $this->createMock(ResponseEvent::class);
-        $responseEvent->expects($this->once())->method('getResponse')->willReturn($httpResponse);
+        $responseEvent = new ResponseEvent(
+            $this->createMock(HttpKernelInterface::class),
+            $this->createMock(Request::class),
+            HttpKernelInterface::MASTER_REQUEST,
+            $httpResponse
+        );
         $this->dataProvider->onKernelResponse($responseEvent);
 
         foreach ($errors as $error) {
-            $exceptionEvent = $this->createMock(ExceptionEvent::class);
-            $exceptionEvent->expects($this->once())->method('getThrowable')->willReturn($error);
+            $exceptionEvent = new ExceptionEvent(
+                $this->createMock(HttpKernelInterface::class),
+                $this->createMock(Request::class),
+                HttpKernelInterface::MASTER_REQUEST,
+                $error
+            );
             $this->eventSubscriber->onException($exceptionEvent);
         }
 
