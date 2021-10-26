@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "88606a5cb5c667b58e821dbc6c532ad4",
+    "content-hash": "4dd65e52bff17f795100d9caf12d3e79",
     "packages": [
         {
             "name": "beberlei/assert",
@@ -2595,16 +2595,16 @@
         },
         {
             "name": "treblle/treblle-php",
-            "version": "v2.x-dev",
+            "version": "2.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Treblle/treblle-php.git",
-                "reference": "33373b29045a57b35a73d4ae947a65d5092e4d9e"
+                "reference": "20fd7315fe469af2271262c336ff72eba624ddd4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Treblle/treblle-php/zipball/33373b29045a57b35a73d4ae947a65d5092e4d9e",
-                "reference": "33373b29045a57b35a73d4ae947a65d5092e4d9e",
+                "url": "https://api.github.com/repos/Treblle/treblle-php/zipball/20fd7315fe469af2271262c336ff72eba624ddd4",
+                "reference": "20fd7315fe469af2271262c336ff72eba624ddd4",
                 "shasum": ""
             },
             "require": {
@@ -2654,9 +2654,9 @@
             ],
             "support": {
                 "issues": "https://github.com/Treblle/treblle-php/issues",
-                "source": "https://github.com/Treblle/treblle-php/tree/v2"
+                "source": "https://github.com/Treblle/treblle-php/tree/2.0.0"
             },
-            "time": "2021-10-25T21:46:15+00:00"
+            "time": "2021-10-26T08:52:58+00:00"
         }
     ],
     "packages-dev": [
@@ -5911,10 +5911,8 @@
         }
     ],
     "aliases": [],
-    "minimum-stability": "dev",
-    "stability-flags": {
-        "treblle/treblle-php": 20
-    },
+    "minimum-stability": "stable",
+    "stability-flags": [],
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
