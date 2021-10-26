@@ -1,8 +1,23 @@
-# Treblle-symfony
+# Treblle for Symfony
 
 Symfony integration for [Treblle](https://treblle.com/).
 
-@todo badges
+[![Latest Version](https://img.shields.io/packagist/v/treblle/treblle-symfony)](https://packagist.org/packages/treblle/treblle-symfony)
+[![Total Downloads](https://img.shields.io/packagist/dt/treblle/treblle-symfony)](https://packagist.org/packages/treblle/treblle-symfony)
+[![MIT Licence](https://img.shields.io/packagist/l/treblle/treblle-symfony)](LICENSE.md)
+
+Treblle makes it super easy to understand what’s going on with your APIs and the apps that use them. Just by adding Treblle to your API out of the box you get:
+* Real-time API monitoring and logging
+* Auto-generated API docs with OAS support
+* API analytics
+* Quality scoring
+* One-click testing
+* API management on the go
+* and more...
+
+## Requirements
+* PHP 7.4+
+* Symfony 4.4+
 
 ## Installation
 
