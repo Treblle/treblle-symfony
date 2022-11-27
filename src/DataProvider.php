@@ -41,7 +41,7 @@ final class DataProvider implements EventSubscriberInterface, RequestDataProvide
 
     public function onKernelRequest(RequestEvent $event): void
     {
-        if ($event->isMasterRequest()) {
+        if ($event->isMainRequest()) {
             $this->httpRequest = $event->getRequest();
             $this->timestampStart = microtime(true);
         }
