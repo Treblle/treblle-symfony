@@ -25,7 +25,6 @@ final class TreblleFactory
         ErrorDataProvider $errorDataProvider
     ): Treblle {
         return new Treblle(
-            $configuration->getEndpointUrl(),
             $configuration->getApiKey(),
             $configuration->getProjectId(),
             $client,
