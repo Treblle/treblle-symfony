@@ -41,9 +41,20 @@ final class DataProvider implements EventSubscriberInterface, RequestDataProvide
 
     public function onKernelRequest(RequestEvent $event): void
     {
-        if ($event->isMasterRequest()) {
-            $this->httpRequest = $event->getRequest();
-            $this->timestampStart = microtime(true);
+        if (method_exists($event, 'isMainRequest')) { // Symfony >= 5.3
+            if ($event->isMainRequest()) {
+                $this->httpRequest = $event->getRequest();
+                $this->timestampStart = microtime(true);
+            }
+            
+            return;
+        }
+        
+        if (method_exists($event, 'isMasterRequest')) { // Symfony < 5.3
+            if ($event->isMasterRequest()) {
+                $this->httpRequest = $event->getRequest();
+                $this->timestampStart = microtime(true);
+            }
         }
     }
 

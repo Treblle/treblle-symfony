@@ -79,7 +79,6 @@ final class TreblleIntegrationTest extends TestCase
         $this->dataProvider = new DataProvider(new PayloadAnonymizer([]));
 
         $this->treblle = new Treblle(
-            'http://127.0.0.1',
             'my api key',
             'my project id',
             $client,
