@@ -1,40 +1,83 @@
-# Treblle for Symfony
+<div align="center">
+  <img src="https://treblle-github.s3.amazonaws.com/header.png"/>
+</div>
+<div align="center">
 
-Symfony integration for [Treblle](https://treblle.com/).
+# Treblle
 
-[![Latest Version](https://img.shields.io/packagist/v/treblle/treblle-symfony)](https://packagist.org/packages/treblle/treblle-symfony)
-[![Total Downloads](https://img.shields.io/packagist/dt/treblle/treblle-symfony)](https://packagist.org/packages/treblle/treblle-symfony)
-[![MIT Licence](https://img.shields.io/packagist/l/treblle/treblle-symfony)](LICENSE)
+<a href="https://docs.treblle.com/en/integrations" target="_blank">Integrations</a>
+<span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>
+<a href="http://treblle.com/" target="_blank">Website</a>
+<span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>
+<a href="https://docs.treblle.com" target="_blank">Docs</a>
+<span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>
+<a href="https://blog.treblle.com" target="_blank">Blog</a>
+<span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>
+<a href="https://twitter.com/treblleapi" target="_blank">Twitter</a>
+<span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>
+<a href="https://treblle.com/chat" target="_blank">Discord</a>
+<br />
 
-Treblle makes it super easy to understand what’s going on with your APIs and the apps that use them. Just by adding Treblle to your API out of the box you get:
-* Real-time API monitoring and logging
-* Auto-generated API docs with OAS support
-* API analytics
-* Quality scoring
-* One-click testing
-* API management on the go
-* and more...
+  <hr />
+</div>
 
-## Requirements
-* PHP 7.4+
-* Symfony 4.4+
+Treblle is a lightweight SDK that helps Engineering and Product teams build, ship & maintain REST based APIs faster.
 
-## Installation
+## Features
 
-To install the SDK you will need to be using [Composer]([https://getcomposer.org/)
-in your project. To install it please see the [docs](https://getcomposer.org/download/).
+<div align="center">
+  <br />
+  <img src="https://treblle-github.s3.amazonaws.com/features.png"/>
+  <br />
+  <br />
+</div>
 
-```bash
+- [API Monitoring & Observability](https://www.treblle.com/features/api-monitoring-observability)
+- [Auto-generated API Docs](https://www.treblle.com/features/auto-generated-api-docs)
+- [API analytics](https://www.treblle.com/features/api-analytics)
+- [Treblle API Score](https://www.treblle.com/features/api-quality-score)
+- [API Lifecycle Collaboration](https://www.treblle.com/features/api-lifecycle)
+- [Native Treblle Apps](https://www.treblle.com/features/native-apps)
+
+
+## How Treblle Works
+Once you’ve integrated a Treblle SDK in your codebase, this SDK will send requests and response data to your Treblle Dashboard.
+
+In your Treblle Dashboard you get to see real-time requests to your API, auto-generated API docs, API analytics like how fast the response was for an endpoint, the load size of the response, etc.
+
+Treblle also uses the requests sent to your Dashboard to calculate your API score which is a quality score that’s calculated based on the performance, quality, and security best practices for your API.
+
+> Visit [https://docs.treblle.com](http://docs.treblle.com) for the complete documentation.
+
+## Security
+
+### Masking fields
+Masking fields ensure certain sensitive data are removed before being sent to Treblle.
+
+To make sure masking is done before any data leaves your server [we built it into all our SDKs](https://docs.treblle.com/en/security/masked-fields#fields-masked-by-default).
+
+This means data masking is super fast and happens on a programming level before the API request is sent to Treblle. You can [customize](https://docs.treblle.com/en/security/masked-fields#custom-masked-fields) exactly which fields are masked when you’re integrating the SDK.
+
+> Visit the [Masked fields](https://docs.treblle.com/en/security/masked-fields) section of the [docs](https://docs.sailscasts.com) for the complete documentation.
+
+
+## Get Started
+
+1. Sign in to [Treblle](https://app.treblle.com).
+2. [Create a Treblle project](https://docs.treblle.com/en/dashboard/projects#creating-a-project).
+3. [Setup the SDK](#install-the-SDK) for your platform.
+
+### Install the SDK
+
+```sh
 composer require treblle/treblle-symfony
 ```
 
-### Step 2: Enable the Bundle
-
-Enable it by adding it to the list of registered bundles depending on the Symfony version you're using.
+Enable it by adding it to the list of registered bundles depending on the Symfony version you’re using.
 
 ```php
 // config/bundles.php
-
+{
     return [
         // ...
         new Treblle\Symfony\TreblleBundle(),
@@ -42,10 +85,7 @@ Enable it by adding it to the list of registered bundles depending on the Symfon
 }
 ```
 
-## Configuration of the SDK
-
-Configure the SDK by adding the following snippet to your project configuration. If you have Symfony 3.4 add it
-to ``app/config/config_prod.yml``. For Symfony 4 or newer add the value to `config/packages/treblle.yaml`.
+Configure the SDK by adding the following snippet to your project configuration. If you have Symfony 3.4 add it to `app/config/config_prod.yml`. For Symfony 4 or newer add the value to `config/packages/treblle.yaml`.
 
 ```yaml
 treblle:
@@ -59,61 +99,66 @@ treblle:
   endpoint_url: "https://rocknrolla.treblle.com" // optional
 ```
 
-# Overriding data providers
+> See the [docs](https://docs.treblle.com/en/integrations/symfony) for this SDK to learn more.
 
-Treblle SDK allows you to take over control over how the data is collected, processed, and sent to the Trebble service.
+## Available SDKs
 
-By default, the SDK will take all values from the `masked` configuration key and combine it with well-known keys such as
-`password` or `ssn` to compile a list of sensitive information. These values will never be sent in a plain text, but
-rather will be masked.
+Treblle provides [open-source SDKs](https://docs.treblle.com/en/integrations) that let you seamlessly integrate Treblle with your REST-based APIs.
 
-Default service configuration for Treblle looks like this:
+- [`treblle-laravel`](https://github.com/Treblle/treblle-laravel): SDK for Laravel
+- [`treblle-php`](https://github.com/Treblle/treblle-php): SDK for PHP
+- [`treblle-symfony`](https://github.com/Treblle/treblle-symfony): SDK for Symfony
+- [`treblle-lumen`](https://github.com/Treblle/treblle-lumen): SDK for Lumen
+- [`treblle-sails`](https://github.com/Treblle/treblle-sails): SDK for Sails
+- [`treblle-adonisjs`](https://github.com/Treblle/treblle-adonisjs): SDK for AdonisJS
+- [`treblle-fastify`](https://github.com/Treblle/treblle-fastify): SDK for Fastify
+- [`treblle-directus`](https://github.com/Treblle/treblle-directus): SDK for Directus
+- [`treblle-strapi`](https://github.com/Treblle/treblle-strapi): SDK for Strapi
+- [`treblle-express`](https://github.com/Treblle/treblle-express): SDK for Express
+- [`treblle-koa`](https://github.com/Treblle/treblle-koa): SDK for Koa
+- [`treblle-go`](https://github.com/Treblle/treblle-go): SDK for Go
+- [`treblle-ruby`](https://github.com/Treblle/treblle-ruby): SDK for Ruby on Rails
+- [`treblle-python`](https://github.com/Treblle/treblle-python): SDK for Python/Django
 
-```yaml
-services:
-  _defaults:
-    autowire: true
-    autoconfigure: true
+> See the [docs](https://docs.treblle.com/en/integrations) for more on SDKs and Integrations.
 
-  treblle-client:
-    class: GuzzleHttp\Client
+## Other Packages
 
-  Treblle\Treblle:
-    factory: [ Treblle\Symfony\DependencyInjection\TreblleFactory, 'createTreblle' ]
-    arguments:
-      $client: '@treblle-client'
+Besides the SDKs, we also provide helpers and configuration used for SDK
+development. If you're thinking about contributing to or creating a SDK, have a look at the resources
+below:
 
-  Treblle\PayloadAnonymizer:
-    factory: [ Treblle\Symfony\DependencyInjection\TreblleFactory, 'createAnonymizer' ]
+- [`treblle-utils`](https://github.com/Treblle/treblle-utils):  A set of helpers and
+  utility functions useful for the JavaScript SDKs.
+- [`php-utils`](https://github.com/Treblle/php-utils):   A set of helpers and
+  utility functions useful for the PHP SDKs.
 
-  Treblle\Symfony\DataProvider: ~
-  Treblle\Symfony\EventSubscriber\TreblleEventSubscriber: ~
-  Treblle\InMemoryErrorDataProvider: ~
-  Treblle\PhpHelper: ~
-  Treblle\PhpLanguageDataProvider: ~
-  Treblle\SuperglobalsServerDataProvider: ~
+## Community 💙
 
-  Treblle\Contract\ErrorDataProvider: '@Treblle\InMemoryErrorDataProvider'
-  Treblle\Contract\LanguageDataProvider: '@Treblle\PhpLanguageDataProvider'
-  Treblle\Contract\RequestDataProvider: '@Treblle\Symfony\DataProvider'
-  Treblle\Contract\ResponseDataProvider: '@Treblle\Symfony\DataProvider'
-  Treblle\Contract\ServerDataProvider: '@Treblle\SuperglobalsServerDataProvider'
-```
+First and foremost: **Star and watch this repository** to stay up-to-date.
 
-If you want to replace any component, feel free to provide your own implementation and register it in the DI container.
-When you alias the interface to point to your implementation instead of the default one, Treblle will use it.
+Also, follow our [Blog](https://blog.treblle.com), and on [Twitter](https://twitter.com/treblleapi).
 
-Example: We want to override how Request data is collected and passed to Treblle
+You can chat with the team and other members on [Discord](https://treblle.com/chat) and follow our tutorials and other video material at [YouTube](https://youtube.com/@treblle).
 
-1. We implement our own service satisfying the `Treblle\Contract\RequestDataProvider` interface in `App\Utils\AcmeRequestDataProvider`
-2. We register the service in our own `services.yaml`:
-```yaml
-  App\Utils\AcmeRequestDataProvider: ~
-```
+[![Treblle Discord](https://img.shields.io/badge/Treblle%20Discord-Join%20our%20Discord-F3F5FC?labelColor=7289DA&style=for-the-badge&logo=discord&logoColor=F3F5FC&link=https://treblle.com/chat)](https://treblle.com/chat)
 
-3. We define servic ealias: `Treblle\Contract\RequestDataProvider: '@AcmeRequestDataProvider'`
-```yaml
-  Treblle\Contract\RequestDataProvider: '@App\Utils\AcmeRequestDataProvider'
-```
+[![Treblle YouTube](https://img.shields.io/badge/Treblle%20YouTube-Subscribe%20on%20YouTube-F3F5FC?labelColor=c4302b&style=for-the-badge&logo=YouTube&logoColor=F3F5FC&link=https://youtube.com/@treblle)](https://youtube.com/@treblle)
 
-Now all instances depending on the `RequestDataProvider` interface will use your service.
+[![Treblle on Twitter](https://img.shields.io/badge/Treblle%20on%20Twitter-Follow%20Us-F3F5FC?labelColor=1DA1F2&style=for-the-badge&logo=Twitter&logoColor=F3F5FC&link=https://twitter.com/treblleapi)](https://twitter.com/treblleapi)
+
+### How to contribute
+
+Here are some ways of contributing to making Treblle better:
+
+- **[Try out Treblle](https://docs.treblle.com/en/introduction#getting-started)**, and let us know ways to make Treblle better for you. Let us know here on [Discord](https://treblle.com/chat).
+- Join our [Discord](https://treblle.com/chat) and connect with other members to share and learn from.
+- Send a pull request to any of our [open source repositories](https://github.com/Treblle) on Github. Check the contribution guide on the repo you want to contribute to for more details about how to contribute. We're looking forward to your contribution!
+
+### Contributors
+<!-- Replace link with the link of the SDK contributors-->
+<a href="https://github.com/Treblle/treblle-symfony/graphs/contributors">
+  <p align="center">
+    <img  src="https://contrib.rocks/image?repo=Treblle/treblle-symfony" alt="A table of avatars from the project's contributors" />
+  </p>
+</a>
