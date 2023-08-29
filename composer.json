@@ -33,7 +33,7 @@
     "php": "^7.4|^8.0",
     "beberlei/assert": "^3.3",
     "thecodingmachine/safe": "^1.3.2",
-    "treblle/treblle-php": "^2.0",
+    "treblle/treblle-php": "^3.0",
     "symfony/config": "^4.4|^5.0|^6.0",
     "symfony/console": "^4.4|^5.0|^6.0",
     "symfony/dependency-injection": "^4.4|^5.0|^6.0",
