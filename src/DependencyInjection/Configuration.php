@@ -21,6 +21,7 @@ final class Configuration implements ConfigurationInterface
             ->scalarNode('api_key')->end()
             ->booleanNode('debug')->end()
             ->arrayNode('masked')->scalarPrototype()->end()
+            ->arrayNode('ignore')->scalarPrototype()->end()
             ->end();
 
         return $treeBuilder;
