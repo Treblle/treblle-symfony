@@ -342,7 +342,7 @@ final class TreblleIntegrationTest extends TestCase
             ->willReturn($language);
 
         $requestEvent = $this->createMock(RequestEvent::class);
-        $requestEvent->expects($this->once())->method('isMasterRequest')->willReturn(true);
+        $requestEvent->expects($this->once())->method('isMainRequest')->willReturn(true);
         $requestEvent->expects($this->once())->method('getRequest')->willReturn($httpRequest);
         $this->dataProvider->onKernelRequest($requestEvent);
 

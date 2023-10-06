@@ -35,6 +35,10 @@ final class TreblleEventSubscriber implements EventSubscriberInterface
 
     public function onKernelTerminate(KernelEvent $event): void
     {
+        if (in_array($event->getRequest()->getRequestUri(), $this->treblle->ignoredUris(), true)) {
+            return;
+        }
+
         try {
             $this->treblle->onShutdown();
         } catch (\Throwable $throwable) {
