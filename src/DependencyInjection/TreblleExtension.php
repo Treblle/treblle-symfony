@@ -27,6 +27,7 @@ final class TreblleExtension extends Extension
             '$endpointUrl' => $config['endpoint_url'],
             '$masked' => $config['masked'],
             '$debug' => $config['debug'],
+            '$ignore' => $config['ignore'],
         ]);
         $container->setDefinition(TreblleConfiguration::class, $definition);
 

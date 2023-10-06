@@ -55,7 +55,7 @@ final class DataProviderTest extends TestCase
     public function test_it_builds_request_correctly(): void
     {
         $event = $this->createMock(RequestEvent::class);
-        $event->expects($this->once())->method('isMasterRequest')->willReturn(true);
+        $event->expects($this->once())->method('isMainRequest')->willReturn(true);
         $event->expects($this->once())->method('getRequest')->willReturn(new Request());
 
         $this->subjectUnderTest->onKernelRequest($event);

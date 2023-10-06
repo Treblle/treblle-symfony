@@ -33,7 +33,8 @@ final class TreblleFactory
             $requestDataProvider,
             $responseDataProvider,
             $errorDataProvider,
-            $configuration->isDebug()
+            $configuration->isDebug(),
+            $configuration->getIgnored(),
         );
     }
 
