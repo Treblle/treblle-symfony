@@ -32,6 +32,7 @@ use Treblle\Treblle;
 
 /**
  * @internal
+ *
  * @coversNothing
  *
  * @small
@@ -46,7 +47,7 @@ final class TreblleIntegrationTest extends TestCase
 
     private array $container = [];
 
-    /** @var ServerDataProvider&MockObject */
+    /** @var MockObject&ServerDataProvider */
     private ServerDataProvider $serverDataProvider;
 
     /** @var LanguageDataProvider&MockObject */
@@ -93,7 +94,7 @@ final class TreblleIntegrationTest extends TestCase
         $this->eventSubscriber = new TreblleEventSubscriber($this->treblle, new NullLogger());
     }
 
-    public function provideTestData(): iterable
+    public function provideIt_correctly_serializes_request_data_on_shutdownCases(): iterable
     {
         $server = new Server(
             '1.1.1.1',
@@ -324,7 +325,7 @@ final class TreblleIntegrationTest extends TestCase
     }
 
     /**
-     * @dataProvider provideTestData
+     * @dataProvider provideIt_correctly_serializes_request_data_on_shutdownCases
      */
     public function test_it_correctly_serializes_request_data_on_shutdown(
         Server $server,

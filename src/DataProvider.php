@@ -46,10 +46,10 @@ final class DataProvider implements EventSubscriberInterface, RequestDataProvide
                 $this->httpRequest = $event->getRequest();
                 $this->timestampStart = microtime(true);
             }
-            
+
             return;
         }
-        
+
         if (method_exists($event, 'isMainRequest')) { // Symfony < 5.3
             if ($event->isMainRequest()) {
                 $this->httpRequest = $event->getRequest();
