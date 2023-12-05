@@ -18,6 +18,7 @@ use Treblle\Treblle;
 
 /**
  * @internal
+ *
  * @coversNothing
  *
  * @small
@@ -26,7 +27,7 @@ final class TreblleEventSubscriberTest extends TestCase
 {
     private TreblleEventSubscriber $subjectUnderTest;
 
-    /** @var Treblle&MockObject */
+    /** @var MockObject&Treblle */
     private Treblle $treblle;
 
     protected function setUp(): void

@@ -34,7 +34,7 @@ final class TreblleEventSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onKernelRequest(KernelEvent  $event): void
+    public function onKernelRequest(KernelEvent $event): void
     {
         $request = $event->getRequest();
         $requestId = $request->headers->get('X-TREBLLE-TRACE-ID', uniqid('req_', true));
@@ -43,7 +43,7 @@ final class TreblleEventSubscriber implements EventSubscriberInterface
 
     public function onKernelTerminate(KernelEvent $event): void
     {
-        if (in_array($event->getRequest()->getRequestUri(), $this->treblle->ignoredUris(), true)) {
+        if (\in_array($event->getRequest()->getRequestUri(), $this->treblle->ignoredUris(), true)) {
             return;
         }
 

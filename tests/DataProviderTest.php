@@ -16,6 +16,7 @@ use Treblle\Symfony\DataProvider;
 
 /**
  * @internal
+ *
  * @coversNothing
  *
  * @small

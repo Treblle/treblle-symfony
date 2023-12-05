@@ -6,30 +6,22 @@ namespace Treblle\Symfony\DependencyInjection;
 
 class TreblleConfiguration
 {
-    /** @var string $apiKey */
     private string $apiKey;
 
-    /** @var string $projectId */
     private string $projectId;
 
-    /** @var string $endpointUrl */
     private string $endpointUrl;
 
-    /** @var list<string> $masked */
+    /** @var list<string> */
     private array $masked;
 
-    /** @var list<string> $ignore */
+    /** @var list<string> */
     private array $ignore;
 
-    /** @var bool $debug */
     private bool $debug;
 
     /**
-     * @param string $apiKey
-     * @param string $projectId
-     * @param string $endpointUrl
      * @param array<int,string> $masked
-     * @param bool $debug
      * @param array<int,string> $ignore
      */
     public function __construct(string $apiKey, string $projectId, string $endpointUrl, array $masked, bool $debug, array $ignore = [])
@@ -42,25 +34,16 @@ class TreblleConfiguration
         $this->debug = $debug;
     }
 
-    /**
-     * @return string
-     */
     public function getApiKey(): string
     {
         return $this->apiKey;
     }
 
-    /**
-     * @return string
-     */
     public function getProjectId(): string
     {
         return $this->projectId;
     }
 
-    /**
-     * @return string
-     */
     public function getEndpointUrl(): string
     {
         return $this->endpointUrl;
@@ -74,9 +57,6 @@ class TreblleConfiguration
         return $this->masked;
     }
 
-    /**
-     * @return bool
-     */
     public function isDebug(): bool
     {
         return $this->debug;
