@@ -28,9 +28,17 @@ final class TreblleEventSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
+            KernelEvents::REQUEST => 'onKernelRequest',
             KernelEvents::TERMINATE => 'onKernelTerminate',
             KernelEvents::EXCEPTION => 'onException',
         ];
+    }
+
+    public function onKernelRequest(KernelEvent  $event): void
+    {
+        $request = $event->getRequest();
+        $requestId = $request->headers->get('X-TREBLLE-TRACE-ID', uniqid('req_', true));
+        $request->attributes->set('requestId', $requestId);
     }
 
     public function onKernelTerminate(KernelEvent $event): void
