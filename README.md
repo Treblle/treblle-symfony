@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://treblle-github.s3.us-east-1.amazonaws.com/github-header.jpg"/>
+  <img src="https://github.com/user-attachments/assets/6331a3c4-5165-4761-90a6-f462dca0edc5"/>
 </div>
 <div align="center">
 
@@ -21,13 +21,15 @@
   <hr />
 </div>
 
-Treblle is a lightweight SDK that helps Engineering and Product teams build, ship & maintain REST based APIs faster.
+API Intelligence Platform. 🚀
+
+Treblle is a lightweight SDK that helps Engineering and Product teams build, ship & maintain REST-based APIs faster.
 
 ## Features
 
 <div align="center">
   <br />
-  <img src="https://treblle-github.s3.amazonaws.com/features.png"/>
+  <img src="https://github.com/user-attachments/assets/0b2cc257-6a61-48f4-9ee3-c3693fc14b31"/>
   <br />
   <br />
 </div>
@@ -63,7 +65,7 @@ This means data masking is super fast and happens on a programming level before 
 
 ## Get Started
 
-1. Sign in to [Treblle](https://app.treblle.com).
+1. Sign in to [Treblle](https://identity.treblle.com/login).
 2. [Create a Treblle project](https://docs.treblle.com/en/dashboard/projects#creating-a-project).
 3. [Setup the SDK](#install-the-SDK) for your platform.
 
