@@ -16,7 +16,7 @@ final class Configuration implements ConfigurationInterface
         $treeBuilder->getRootNode()
             ->children()
             ->scalarNode('url')
-            ->defaultValue(null)
+            ->defaultNull()
             ->end()
             ->scalarNode('api_key')
             ->end()
@@ -29,6 +29,7 @@ final class Configuration implements ConfigurationInterface
             ->end()
             ->end()
             ->booleanNode('debug')
+            ->defaultFalse()
             ->end()
             ->end()
             ->end();
