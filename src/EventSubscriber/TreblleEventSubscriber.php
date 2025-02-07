@@ -5,8 +5,7 @@ declare(strict_types=1);
 namespace Treblle\Symfony\EventSubscriber;
 
 use Throwable;
-use Treblle\Treblle;
-use function in_array;
+use Treblle\Php\Treblle;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Event\KernelEvent;
@@ -15,14 +14,10 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class TreblleEventSubscriber implements EventSubscriberInterface
 {
-    private Treblle $treblle;
-
-    private LoggerInterface $logger;
-
-    public function __construct(Treblle $treblle, LoggerInterface $logger)
-    {
-        $this->treblle = $treblle;
-        $this->logger = $logger;
+    public function __construct(
+        private Treblle         $treblle,
+        private LoggerInterface $logger
+    ) {
     }
 
     /**
@@ -33,23 +28,18 @@ final class TreblleEventSubscriber implements EventSubscriberInterface
         return [
             KernelEvents::REQUEST => 'onKernelRequest',
             KernelEvents::TERMINATE => 'onKernelTerminate',
-            KernelEvents::EXCEPTION => 'onException',
+            KernelEvents::EXCEPTION => 'onKernelException',
         ];
     }
 
     public function onKernelRequest(KernelEvent $event): void
     {
         $request = $event->getRequest();
-        $requestId = $request->headers->get('X-TREBLLE-TRACE-ID', uniqid('req_', true));
-        $request->attributes->set('requestId', $requestId);
+        $request->attributes->set('treblle_request_started_at', microtime(true));
     }
 
     public function onKernelTerminate(KernelEvent $event): void
     {
-        if (in_array($event->getRequest()->getRequestUri(), $this->treblle->ignoredUris(), true)) {
-            return;
-        }
-
         try {
             $this->treblle->onShutdown();
         } catch (Throwable $throwable) {
@@ -57,7 +47,7 @@ final class TreblleEventSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function onException(KernelEvent $event): void
+    public function onKernelException(KernelEvent $event): void
     {
         if (! $event instanceof ExceptionEvent) {
             return;
