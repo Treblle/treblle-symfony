@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tests\Treblle\Symfony;
+namespace Treblle\Symfony\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\JsonResponse;

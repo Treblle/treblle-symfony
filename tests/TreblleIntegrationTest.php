@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tests\Treblle\Unit;
+namespace Treblle\Symfony\Tests;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Handler\MockHandler;
