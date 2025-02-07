@@ -13,7 +13,7 @@ final readonly class TreblleConfiguration
         private string  $apiKey,
         private string  $projectId,
         private ?string $url = null,
-        private string  $ignoredEnvironments = 'dev,test,testing',
+        private array $ignoredEnvironments = ['dev', 'test', 'testing'],
         private array   $maskedFields = [],
         private bool    $debug = false,
     ) {

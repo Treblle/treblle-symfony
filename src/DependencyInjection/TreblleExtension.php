@@ -26,8 +26,8 @@ final class TreblleExtension extends Extension
             '$apiKey' => $config['api_key'],
             '$projectId' => $config['project_id'],
             '$ignoredEnvironments' => $config['ignored_environments'],
-            '$maskedFields' => $config['masked_fields'],
-            '$debug' => $config['debug'],
+            '$maskedFields' => (array)$config['masked_fields'],
+            '$debug' => (bool)$config['debug'],
         ]);
         $container->setDefinition(TreblleConfiguration::class, $definition);
 
