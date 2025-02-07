@@ -5,15 +5,13 @@ declare(strict_types=1);
 namespace Treblle\Symfony;
 
 use Throwable;
-use function assert;
 use RuntimeException;
-use function is_string;
-use Treblle\Model\Request;
-use Treblle\Model\Response;
-use Treblle\PayloadAnonymizer;
-use Treblle\Contract\RequestDataProvider;
-use Treblle\Contract\ResponseDataProvider;
+use Treblle\Php\FieldMasker;
+use Treblle\Php\DataTransferObject\Request;
+use Treblle\Php\DataTransferObject\Response;
+use Treblle\Php\Contract\RequestDataProvider;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Treblle\Php\Contract\ResponseDataProvider;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpFoundation\Request as HttpRequest;
@@ -22,17 +20,14 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class DataProvider implements EventSubscriberInterface, RequestDataProvider, ResponseDataProvider
 {
-    private PayloadAnonymizer $payloadAnonymizer;
-
     private ?HttpResponse $httpResponse = null;
 
     private ?HttpRequest $httpRequest = null;
 
     private float $timestampStart = 0;
 
-    public function __construct(PayloadAnonymizer $payloadAnonymizer)
+    public function __construct(private FieldMasker $fieldMasker)
     {
-        $this->payloadAnonymizer = $payloadAnonymizer;
     }
 
     /**
@@ -48,20 +43,12 @@ final class DataProvider implements EventSubscriberInterface, RequestDataProvide
 
     public function onKernelRequest(RequestEvent $event): void
     {
-        if (method_exists($event, 'isMainRequest')) { // Symfony >= 5.3
-            if ($event->isMainRequest()) {
-                $this->httpRequest = $event->getRequest();
-                $this->timestampStart = microtime(true);
-            }
-
-            return;
-        }
-
-        if (method_exists($event, 'isMainRequest')) { // Symfony < 5.3
-            if ($event->isMainRequest()) {
-                $this->httpRequest = $event->getRequest();
-                $this->timestampStart = microtime(true);
-            }
+        if (
+            method_exists($event, 'isMainRequest') &&
+            $event->isMainRequest()
+        ) {
+            $this->httpRequest = $event->getRequest();
+            $this->timestampStart = microtime(true) * 1000;
         }
     }
 
@@ -78,9 +65,8 @@ final class DataProvider implements EventSubscriberInterface, RequestDataProvide
 
         try {
             $requestData = $this->httpRequest->getContent() ?: '';
-            assert(is_string($requestData));
             $requestData = json_decode($requestData, true);
-            $requestBody = $this->payloadAnonymizer->annonymize($requestData);
+            $requestBody = $this->fieldMasker->mask($requestData);
         } catch (Throwable $throwable) {
             $requestBody = [];
         }
@@ -97,7 +83,7 @@ final class DataProvider implements EventSubscriberInterface, RequestDataProvide
             $this->httpRequest->headers->get('USER-AGENT', 'unknown') ?: 'unknown',
             $this->httpRequest->getMethod(),
             $this->normalizeHeaders($this->httpRequest->headers->all()),
-            $this->payloadAnonymizer->annonymize($requestParams),
+            $this->fieldMasker->mask($requestParams),
             $requestBody
         );
     }
@@ -114,7 +100,7 @@ final class DataProvider implements EventSubscriberInterface, RequestDataProvide
             $content = $this->httpResponse->getContent() ?: '';
             $responseSize = mb_strlen($content);
             $responseBody = json_decode($content, true);
-            $responseBody = $this->payloadAnonymizer->annonymize($responseBody);
+            $responseBody = $this->fieldMasker->mask($responseBody);
         } catch (Throwable $throwable) {
             $responseBody = [];
         }
@@ -131,8 +117,7 @@ final class DataProvider implements EventSubscriberInterface, RequestDataProvide
     }
 
     /**
-     * @param array<string, array<string>> $allHeaders
-     *
+     * @param  array<string, array<string>>  $allHeaders
      * @return array<string, string>
      */
     private function normalizeHeaders(array $allHeaders): array
