@@ -48,7 +48,7 @@ final class DataProvider implements EventSubscriberInterface, RequestDataProvide
             $event->isMainRequest()
         ) {
             $this->httpRequest = $event->getRequest();
-            $this->timestampStart = microtime(true) * 1000;
+            $this->timestampStart = microtime(true);
         }
     }
 
@@ -85,7 +85,7 @@ final class DataProvider implements EventSubscriberInterface, RequestDataProvide
             ip: $this->httpRequest->getClientIp() ?: 'bogon',
             user_agent: $this->httpRequest->headers->get('USER-AGENT', '') ?: '',
             method: $this->httpRequest->getMethod(),
-            headers: $this->fieldMasker->mask($this->httpRequest->headers->all()),
+            headers: $this->fieldMasker->mask($this->normalizeHeaders($this->httpRequest->headers->all())),
             query: $this->fieldMasker->mask($this->httpRequest->query->all()),
             body: $this->fieldMasker->mask($this->httpRequest->request->all()),
             route_path: $this->httpRequest->attributes->get('_route')?->getPath() ?? null,
@@ -110,14 +110,15 @@ final class DataProvider implements EventSubscriberInterface, RequestDataProvide
             $responseBody = [];
         }
 
-        $time = (float) microtime(true) - $this->timestampStart;
+        // converting to milliseconds
+        $time = (float) (microtime(true) * 1000) - ($this->timestampStart * 1000);
 
         return new Response(
-            $this->normalizeHeaders($this->httpResponse->headers->all()),
-            $this->httpResponse->getStatusCode(),
-            $responseSize,
-            $time,
-            $responseBody,
+            code: $this->httpResponse->getStatusCode(),
+            size: $responseSize,
+            load_time: $time,
+            body: $this->fieldMasker->mask($responseBody),
+            headers: $this->fieldMasker->mask($this->normalizeHeaders($this->httpRequest->headers->all())),
         );
     }
 
