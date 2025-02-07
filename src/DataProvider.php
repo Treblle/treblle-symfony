@@ -59,37 +59,42 @@ final class DataProvider implements EventSubscriberInterface, RequestDataProvide
 
     public function getRequest(): Request
     {
+        // TODO: By default it should be invoked, remove once confirmed
         if (null === $this->httpRequest) {
             throw new RuntimeException('No request available');
         }
 
-        try {
-            $requestData = $this->httpRequest->getContent() ?: '';
-            $requestData = json_decode($requestData, true);
-            $requestBody = $this->fieldMasker->mask($requestData);
-        } catch (Throwable $throwable) {
-            $requestBody = [];
-        }
+        // TODO: Why we are getting request content here ?
+        //        try {
+        //            $requestData = $this->httpRequest->getContent() ?: '';
+        //            $requestData = json_decode($requestData, true);
+        //            $requestBody = $this->fieldMasker->mask($requestData);
+        //        } catch (Throwable $throwable) {
+        //            $requestBody = [];
+        //        }
 
-        $requestParams = array_merge(
-            $this->httpRequest->request->all(),
-            $this->httpRequest->query->all(),
-        );
+        // TODO: verify what is returned in request all does it includes query already
+        //        $requestParams = array_merge(
+        //            $this->httpRequest->request->all(),
+        //            $this->httpRequest->query->all(),
+        //        );
 
         return new Request(
-            gmdate('Y-m-d H:i:s'),
-            $this->httpRequest->getClientIp() ?: 'unknown',
-            $this->httpRequest->getUri(),
-            $this->httpRequest->headers->get('USER-AGENT', 'unknown') ?: 'unknown',
-            $this->httpRequest->getMethod(),
-            $this->normalizeHeaders($this->httpRequest->headers->all()),
-            $this->fieldMasker->mask($requestParams),
-            $requestBody
+            timestamp: gmdate('Y-m-d H:i:s'),
+            url: $this->httpRequest->getUri(),
+            ip: $this->httpRequest->getClientIp() ?: 'bogon',
+            user_agent: $this->httpRequest->headers->get('USER-AGENT', '') ?: '',
+            method: $this->httpRequest->getMethod(),
+            headers: $this->fieldMasker->mask($this->httpRequest->headers->all()),
+            query: $this->fieldMasker->mask($this->httpRequest->query->all()),
+            body: $this->fieldMasker->mask($this->httpRequest->request->all()),
+            route_path: $this->httpRequest->attributes->get('_route')?->getPath() ?? null,
         );
     }
 
     public function getResponse(): Response
     {
+        // TODO: By default it should be invoked, remove once confirmed
         if (null === $this->httpResponse) {
             throw new RuntimeException('No response available');
         }
