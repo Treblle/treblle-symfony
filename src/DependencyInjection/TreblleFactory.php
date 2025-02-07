@@ -7,11 +7,11 @@ namespace Treblle\Symfony\DependencyInjection;
 use Treblle\Treblle;
 use Treblle\PayloadAnonymizer;
 use GuzzleHttp\ClientInterface;
-use Treblle\Contract\ErrorDataProvider;
-use Treblle\Contract\ServerDataProvider;
-use Treblle\Contract\RequestDataProvider;
-use Treblle\Contract\LanguageDataProvider;
-use Treblle\Contract\ResponseDataProvider;
+use Treblle\Php\Contract\ErrorDataProvider;
+use Treblle\Php\Contract\ServerDataProvider;
+use Treblle\Php\Contract\RequestDataProvider;
+use Treblle\Php\Contract\LanguageDataProvider;
+use Treblle\Php\Contract\ResponseDataProvider;
 
 final class TreblleFactory
 {
