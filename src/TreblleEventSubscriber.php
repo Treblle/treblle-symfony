@@ -12,13 +12,15 @@ use Treblle\Php\DataTransferObject\Response;
 use Treblle\Php\Contract\RequestDataProvider;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Treblle\Php\Contract\ResponseDataProvider;
+use Symfony\Component\HttpKernel\Event\KernelEvent;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
+use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpFoundation\Request as HttpRequest;
 use Symfony\Component\HttpFoundation\Response as HttpResponse;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final class DataProvider implements EventSubscriberInterface, RequestDataProvider, ResponseDataProvider
+final class TreblleEventSubscriber implements EventSubscriberInterface, RequestDataProvider, ResponseDataProvider
 {
     private ?HttpResponse $httpResponse = null;
 
@@ -38,6 +40,8 @@ final class DataProvider implements EventSubscriberInterface, RequestDataProvide
         return [
             KernelEvents::REQUEST => 'onKernelRequest',
             KernelEvents::RESPONSE => 'onKernelResponse',
+            KernelEvents::TERMINATE => 'onKernelTerminate',
+            KernelEvents::EXCEPTION => 'onKernelException',
         ];
     }
 
@@ -47,7 +51,9 @@ final class DataProvider implements EventSubscriberInterface, RequestDataProvide
             method_exists($event, 'isMainRequest') &&
             $event->isMainRequest()
         ) {
-            $this->httpRequest = $event->getRequest();
+            $request = $event->getRequest();
+            $this->httpRequest = $request;
+            $request->attributes->set('treblle_request_started_at', microtime(true));
             $this->timestampStart = microtime(true);
         }
     }
@@ -120,6 +126,29 @@ final class DataProvider implements EventSubscriberInterface, RequestDataProvide
             body: $this->fieldMasker->mask($responseBody),
             headers: $this->fieldMasker->mask($this->normalizeHeaders($this->httpRequest->headers->all())),
         );
+    }
+
+    public function onKernelTerminate(KernelEvent $event): void
+    {
+        //        try {
+        //            $this->treblle->onShutdown();
+        //        } catch (Throwable $throwable) {
+        //            $this->logger->error($throwable->getMessage());
+        //        }
+    }
+
+    public function onKernelException(KernelEvent $event): void
+    {
+        if (! $event instanceof ExceptionEvent) {
+            return;
+        }
+
+        //        try {
+        //            $throwable = $event->getThrowable();
+        //            $this->treblle->onException($throwable);
+        //        } catch (Throwable $throwable) {
+        //            $this->logger->error($throwable->getMessage());
+        //        }
     }
 
     /**
