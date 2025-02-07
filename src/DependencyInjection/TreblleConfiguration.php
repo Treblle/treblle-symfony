@@ -4,34 +4,19 @@ declare(strict_types=1);
 
 namespace Treblle\Symfony\DependencyInjection;
 
-final class TreblleConfiguration
+final readonly class TreblleConfiguration
 {
-    private string $apiKey;
-
-    private string $projectId;
-
-    private string $endpointUrl;
-
-    /** @var list<string> */
-    private array $masked;
-
-    /** @var list<string> */
-    private array $ignore;
-
-    private bool $debug;
-
     /**
-     * @param array<int,string> $masked
-     * @param array<int,string> $ignore
+     * @param array<int,string> $maskedFields
      */
-    public function __construct(string $apiKey, string $projectId, string $endpointUrl, array $masked, bool $debug, array $ignore = [])
-    {
-        $this->apiKey = $apiKey;
-        $this->projectId = $projectId;
-        $this->endpointUrl = $endpointUrl;
-        $this->masked = $masked;
-        $this->ignore = $ignore;
-        $this->debug = $debug;
+    public function __construct(
+        private string  $apiKey,
+        private string  $projectId,
+        private ?string $url = null,
+        private string  $ignoredEnvironments = 'dev,test,testing',
+        private array   $maskedFields = [],
+        private bool    $debug = false,
+    ) {
     }
 
     public function getApiKey(): string
@@ -44,17 +29,14 @@ final class TreblleConfiguration
         return $this->projectId;
     }
 
-    public function getEndpointUrl(): string
+    public function getIgnoredEnvironments(): string
     {
-        return $this->endpointUrl;
+        return $this->ignoredEnvironments;
     }
 
-    /**
-     * @return array<int,string>
-     */
-    public function getMasked(): array
+    public function getMaskedFields(): array
     {
-        return $this->masked;
+        return $this->maskedFields;
     }
 
     public function isDebug(): bool
@@ -62,11 +44,8 @@ final class TreblleConfiguration
         return $this->debug;
     }
 
-    /**
-     * @return array<int,string>
-     */
-    public function getIgnored(): array
+    public function getUrl(): string
     {
-        return $this->ignore;
+        return $this->url;
     }
 }
