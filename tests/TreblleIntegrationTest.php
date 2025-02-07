@@ -4,31 +4,33 @@ declare(strict_types=1);
 
 namespace Treblle\Symfony\Tests;
 
+use Exception;
+use LogicException;
+use Treblle\Treblle;
+use Treblle\Model\Os;
 use GuzzleHttp\Client;
-use GuzzleHttp\Handler\MockHandler;
-use GuzzleHttp\HandlerStack;
-use GuzzleHttp\Middleware;
-use JsonSchema\Validator;
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
+use JsonSchema\Validator;
+use Treblle\Model\Server;
+use GuzzleHttp\Middleware;
+use Treblle\Model\Language;
+use GuzzleHttp\HandlerStack;
+use Treblle\PayloadAnonymizer;
+use PHPUnit\Framework\TestCase;
+use Treblle\Symfony\DataProvider;
+use GuzzleHttp\Handler\MockHandler;
+use Treblle\InMemoryErrorDataProvider;
+use Treblle\Contract\ServerDataProvider;
+use Treblle\Contract\LanguageDataProvider;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Event\KernelEvent;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Treblle\Contract\LanguageDataProvider;
-use Treblle\Contract\ServerDataProvider;
-use Treblle\InMemoryErrorDataProvider;
-use Treblle\Model\Language;
-use Treblle\Model\Os;
-use Treblle\Model\Server;
-use Treblle\PayloadAnonymizer;
-use Treblle\Symfony\DataProvider;
+use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Treblle\Symfony\EventSubscriber\TreblleEventSubscriber;
-use Treblle\Treblle;
 
 /**
  * @internal
@@ -66,7 +68,7 @@ final class TreblleIntegrationTest extends TestCase
         parent::setUp();
 
         $this->validator = new Validator();
-        $this->schemaPath = __DIR__.'/../vendor/treblle/treblle-php/schema/request.json';
+        $this->schemaPath = __DIR__ . '/../vendor/treblle/treblle-php/schema/request.json';
 
         $this->mockHandler = new MockHandler([]);
         $history = Middleware::history($this->container);
@@ -125,10 +127,10 @@ final class TreblleIntegrationTest extends TestCase
                     'HTTP_ACCEPT_LANGUAGE' => 'en-us,en;q=0.5',
                     'HTTP_ACCEPT_CHARSET' => 'ISO-8859-1,utf-8;q=0.7,*;q=0.7',
                 ],
-                \Safe\json_encode(['baz' => 'bash']),
+                json_encode(['baz' => 'bash']),
             ),
             'response' => new Response(
-                \Safe\json_encode(['status' => 'ok']),
+                json_encode(['status' => 'ok']),
                 200,
                 [
                     'Accept' => 'application/json',
@@ -220,10 +222,10 @@ final class TreblleIntegrationTest extends TestCase
                     'HTTP_ACCEPT_LANGUAGE' => 'en-us,en;q=0.5',
                     'HTTP_ACCEPT_CHARSET' => 'ISO-8859-1,utf-8;q=0.7,*;q=0.7',
                 ],
-                \Safe\json_encode(['baz' => 'bash']),
+                json_encode(['baz' => 'bash']),
             ),
             'response' => new Response(
-                \Safe\json_encode(['status' => 'ok']),
+                json_encode(['status' => 'ok']),
                 200,
                 [
                     'Accept' => 'application/json',
@@ -233,12 +235,12 @@ final class TreblleIntegrationTest extends TestCase
                 ],
             ),
             'errors' => [
-                new \Exception(
+                new Exception(
                     'message',
                     1,
                     null,
                 ),
-                new \LogicException(
+                new LogicException(
                     'UNHANDLED_EXCEPTION',
                     2,
                     null,
@@ -373,7 +375,7 @@ final class TreblleIntegrationTest extends TestCase
         $this->assertInstanceOf(\GuzzleHttp\Psr7\Request::class, $request);
 
         $requestBody = $request->getBody()->getContents();
-        $decodedRequestBody = \Safe\json_decode($requestBody, true);
+        $decodedRequestBody = json_decode($requestBody, true);
         // Don't compare timestamp
         $expectedRequest['data']['request']['timestamp'] = $decodedRequestBody['data']['request']['timestamp'];
 
@@ -382,14 +384,14 @@ final class TreblleIntegrationTest extends TestCase
 
         $this->assertEquals($decodedRequestBody, $expectedRequest);
 
-        $requestBody = \Safe\json_decode($requestBody);
-        $this->validator->validate($requestBody, (object) ['$ref' => 'file://'.realpath($this->schemaPath)]);
+        $requestBody = json_decode($requestBody);
+        $this->validator->validate($requestBody, (object) ['$ref' => 'file://' . realpath($this->schemaPath)]);
 
         $this->assertTrue(
             $this->validator->isValid(),
             array_reduce(
                 $this->validator->getErrors(),
-                static fn (string $carry, array $error) => $carry."\n".\Safe\json_encode($error),
+                static fn (string $carry, array $error) => $carry . "\n" . json_encode($error),
                 ''
             )
         );

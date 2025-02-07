@@ -4,15 +4,16 @@ declare(strict_types=1);
 
 namespace Treblle\Symfony\Tests;
 
+use RuntimeException;
+use Treblle\PayloadAnonymizer;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpFoundation\JsonResponse;
+use Treblle\Symfony\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Component\HttpKernel\KernelEvents;
-use Treblle\PayloadAnonymizer;
-use Treblle\Symfony\DataProvider;
 
 /**
  * @internal
@@ -41,14 +42,14 @@ final class DataProviderTest extends TestCase
 
     public function test_it_throws_exception_when_accesing_request_without_setting_it(): void
     {
-        $this->expectException(\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('No request available');
         $this->subjectUnderTest->getRequest();
     }
 
     public function test_it_throws_exception_when_accesing_response_without_setting_it(): void
     {
-        $this->expectException(\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('No response available');
         $this->subjectUnderTest->getResponse();
     }

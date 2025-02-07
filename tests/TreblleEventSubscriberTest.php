@@ -4,17 +4,18 @@ declare(strict_types=1);
 
 namespace Treblle\Symfony\Tests;
 
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
+use Throwable;
+use Treblle\Treblle;
 use Psr\Log\NullLogger;
+use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Event\TerminateEvent;
-use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Component\HttpKernel\KernelEvents;
 use Treblle\Symfony\EventSubscriber\TreblleEventSubscriber;
-use Treblle\Treblle;
 
 /**
  * @internal
@@ -65,7 +66,7 @@ final class TreblleEventSubscriberTest extends TestCase
             $this->createMock(HttpKernelInterface::class),
             $this->createMock(Request::class),
             HttpKernelInterface::MASTER_REQUEST,
-            $this->createMock(\Throwable::class)
+            $this->createMock(Throwable::class)
         );
 
         $this->treblle->expects($this->once())

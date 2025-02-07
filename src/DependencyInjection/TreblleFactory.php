@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Treblle\Symfony\DependencyInjection;
 
+use Treblle\Treblle;
+use Treblle\PayloadAnonymizer;
 use GuzzleHttp\ClientInterface;
 use Treblle\Contract\ErrorDataProvider;
-use Treblle\Contract\LanguageDataProvider;
-use Treblle\Contract\RequestDataProvider;
-use Treblle\Contract\ResponseDataProvider;
 use Treblle\Contract\ServerDataProvider;
-use Treblle\PayloadAnonymizer;
-use Treblle\Treblle;
+use Treblle\Contract\RequestDataProvider;
+use Treblle\Contract\LanguageDataProvider;
+use Treblle\Contract\ResponseDataProvider;
 
 final class TreblleFactory
 {

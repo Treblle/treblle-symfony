@@ -4,23 +4,30 @@ declare(strict_types=1);
 
 namespace Treblle\Symfony;
 
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpFoundation\Request as HttpRequest;
-use Symfony\Component\HttpFoundation\Response as HttpResponse;
-use Symfony\Component\HttpKernel\Event\RequestEvent;
-use Symfony\Component\HttpKernel\Event\ResponseEvent;
-use Symfony\Component\HttpKernel\KernelEvents;
-use Treblle\Contract\RequestDataProvider;
-use Treblle\Contract\ResponseDataProvider;
+use Throwable;
+use function assert;
+use RuntimeException;
+use function is_string;
 use Treblle\Model\Request;
 use Treblle\Model\Response;
 use Treblle\PayloadAnonymizer;
+use Treblle\Contract\RequestDataProvider;
+use Treblle\Contract\ResponseDataProvider;
+use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
+use Symfony\Component\HttpFoundation\Request as HttpRequest;
+use Symfony\Component\HttpFoundation\Response as HttpResponse;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class DataProvider implements EventSubscriberInterface, RequestDataProvider, ResponseDataProvider
 {
     private PayloadAnonymizer $payloadAnonymizer;
+
     private ?HttpResponse $httpResponse = null;
+
     private ?HttpRequest $httpRequest = null;
+
     private float $timestampStart = 0;
 
     public function __construct(PayloadAnonymizer $payloadAnonymizer)
@@ -65,16 +72,16 @@ final class DataProvider implements EventSubscriberInterface, RequestDataProvide
 
     public function getRequest(): Request
     {
-        if ($this->httpRequest === null) {
-            throw new \RuntimeException('No request available');
+        if (null === $this->httpRequest) {
+            throw new RuntimeException('No request available');
         }
 
         try {
             $requestData = $this->httpRequest->getContent() ?: '';
-            \assert(\is_string($requestData));
-            $requestData = \Safe\json_decode($requestData, true);
+            assert(is_string($requestData));
+            $requestData = json_decode($requestData, true);
             $requestBody = $this->payloadAnonymizer->annonymize($requestData);
-        } catch (\Throwable $throwable) {
+        } catch (Throwable $throwable) {
             $requestBody = [];
         }
 
@@ -84,7 +91,7 @@ final class DataProvider implements EventSubscriberInterface, RequestDataProvide
         );
 
         return new Request(
-            \Safe\gmdate('Y-m-d H:i:s'),
+            gmdate('Y-m-d H:i:s'),
             $this->httpRequest->getClientIp() ?: 'unknown',
             $this->httpRequest->getUri(),
             $this->httpRequest->headers->get('USER-AGENT', 'unknown') ?: 'unknown',
@@ -97,8 +104,8 @@ final class DataProvider implements EventSubscriberInterface, RequestDataProvide
 
     public function getResponse(): Response
     {
-        if ($this->httpResponse === null) {
-            throw new \RuntimeException('No response available');
+        if (null === $this->httpResponse) {
+            throw new RuntimeException('No response available');
         }
 
         $responseSize = 0;
@@ -106,9 +113,9 @@ final class DataProvider implements EventSubscriberInterface, RequestDataProvide
         try {
             $content = $this->httpResponse->getContent() ?: '';
             $responseSize = mb_strlen($content);
-            $responseBody = \Safe\json_decode($content, true);
+            $responseBody = json_decode($content, true);
             $responseBody = $this->payloadAnonymizer->annonymize($responseBody);
-        } catch (\Throwable $throwable) {
+        } catch (Throwable $throwable) {
             $responseBody = [];
         }
 

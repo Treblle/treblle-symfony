@@ -6,4 +6,6 @@ namespace Treblle\Symfony;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-final class TreblleBundle extends Bundle {}
+final class TreblleBundle extends Bundle
+{
+}

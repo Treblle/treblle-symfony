@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Treblle\Symfony\DependencyInjection;
 
-class TreblleConfiguration
+final class TreblleConfiguration
 {
     private string $apiKey;
 
