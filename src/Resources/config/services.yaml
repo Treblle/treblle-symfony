@@ -13,13 +13,12 @@ services:
 
   Treblle\Symfony\DataProvider: ~
   Treblle\Symfony\EventSubscriber\TreblleEventSubscriber: ~
-  Treblle\InMemoryErrorDataProvider: ~
-  Treblle\PhpHelper: ~
-  Treblle\PhpLanguageDataProvider: ~
-  Treblle\SuperglobalsServerDataProvider: ~
+  Treblle\Php\InMemoryErrorDataProvider: ~
+  Treblle\Php\PhpLanguageDataProvider: ~
+  Treblle\Php\SuperGlobalsServerDataProvider: ~
 
-  Treblle\Contract\ErrorDataProvider: '@Treblle\InMemoryErrorDataProvider'
-  Treblle\Contract\LanguageDataProvider: '@Treblle\PhpLanguageDataProvider'
-  Treblle\Contract\RequestDataProvider: '@Treblle\Symfony\DataProvider'
-  Treblle\Contract\ResponseDataProvider: '@Treblle\Symfony\DataProvider'
-  Treblle\Contract\ServerDataProvider: '@Treblle\SuperglobalsServerDataProvider'
+  Treblle\Php\Contract\ErrorDataProvider: '@Treblle\Php\InMemoryErrorDataProvider'
+  Treblle\Php\Contract\LanguageDataProvider: '@Treblle\Php\PhpLanguageDataProvider'
+  Treblle\Php\Contract\RequestDataProvider: '@Treblle\Symfony\DataProvider'
+  Treblle\Php\Contract\ResponseDataProvider: '@Treblle\Symfony\DataProvider'
+  Treblle\Php\Contract\ServerDataProvider: '@Treblle\Php\SuperGlobalsServerDataProvider'
