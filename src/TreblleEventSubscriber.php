@@ -94,6 +94,13 @@ final class TreblleEventSubscriber implements EventSubscriberInterface
      */
     public function onKernelTerminate(KernelEvent $event): void
     {
+        $ignoredEnvironments = array_map('trim', explode(',', $this->configuration->getIgnoredEnvironments()));
+        $appEnvironment = $_ENV['APP_ENV'];
+
+        if (in_array($appEnvironment, $ignoredEnvironments)) {
+            return;
+        }
+
         $routePath = $this->router->getRouteCollection()->get($this->request->attributes->get('_route'))->getPath();
         $requestProvider = new SymfonyRequestDataProvider($this->configuration, $this->request, $routePath);
         $responseProvider = new SymfonyResponseDataProvider($this->configuration, $this->request, $this->response, $this->errorDataProvider);
