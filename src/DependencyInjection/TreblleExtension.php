@@ -23,8 +23,8 @@ final class TreblleExtension extends Extension
         $definition = new Definition(TreblleConfiguration::class);
         $definition->setArguments([
             '$url' => $config['url'],
-            '$apiKey' => $config['api_key'],
-            '$projectId' => $config['project_id'],
+            '$apiKey' => $config['api_key'] ?? '',
+            '$projectId' => $config['project_id'] ?? '',
             '$ignoredEnvironments' => $config['ignored_environments'],
             '$maskedFields' => (array)$config['masked_fields'],
             '$debug' => (bool)$config['debug'],
