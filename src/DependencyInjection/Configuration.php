@@ -17,8 +17,8 @@ final class Configuration implements ConfigurationInterface
             ->getRootNode()
             ->children()
             ->scalarNode('url')->defaultNull()->end()
-            ->scalarNode('api_key')->end()
-            ->scalarNode('project_id')->end()
+            ->scalarNode('api_key')->defaultValue('')->end()
+            ->scalarNode('project_id')->defaultValue('')->end()
             ->scalarNode('ignored_environments')->defaultValue('dev,test,testing')->end()
             ->arrayNode('masked_fields')->scalarPrototype()->end()
             ->defaultValue([
