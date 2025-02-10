@@ -12,11 +12,11 @@ use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 
 final class TreblleExtension extends Extension
 {
-    /**
-     * @param array<int, mixed> $configs
-     */
     public function load(array $configs, ContainerBuilder $container): void
     {
+        $loader = new YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
+        $loader->load('services.yaml');
+
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
 
@@ -29,12 +29,7 @@ final class TreblleExtension extends Extension
             '$maskedFields' => (array)$config['masked_fields'],
             '$debug' => (bool)$config['debug'],
         ]);
-        $container->setDefinition(TreblleConfiguration::class, $definition);
 
-        $loader = new YamlFileLoader(
-            $container,
-            new FileLocator(__DIR__ . '/../Resources/config')
-        );
-        $loader->load('services.yaml');
+        $container->setDefinition(TreblleConfiguration::class, $definition);
     }
 }

@@ -3,14 +3,8 @@ services:
     autowire: true
     autoconfigure: true
 
-  Treblle\Symfony\DataProvider: ~
-  Treblle\Symfony\EventSubscriber\TreblleEventSubscriber: ~
-  Treblle\Php\InMemoryErrorDataProvider: ~
-  Treblle\Php\PhpLanguageDataProvider: ~
-  Treblle\Php\SuperGlobalsServerDataProvider: ~
+  Treblle\Symfony\DataProviders\SymfonyRequestDataProvider: ~
+  Treblle\Symfony\DataProviders\SymfonyResponseDataProvider: ~
 
-  Treblle\Php\Contract\ErrorDataProvider: '@Treblle\Php\InMemoryErrorDataProvider'
-  Treblle\Php\Contract\LanguageDataProvider: '@Treblle\Php\PhpLanguageDataProvider'
-  Treblle\Php\Contract\RequestDataProvider: '@Treblle\Symfony\DataProvider'
-  Treblle\Php\Contract\ResponseDataProvider: '@Treblle\Symfony\DataProvider'
-  Treblle\Php\Contract\ServerDataProvider: '@Treblle\Php\SuperGlobalsServerDataProvider'
+  Treblle\Php\Contract\ErrorDataProvider:
+    class: 'Treblle\Php\InMemoryErrorDataProvider'

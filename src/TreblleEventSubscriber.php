@@ -5,43 +5,39 @@ declare(strict_types=1);
 namespace Treblle\Symfony;
 
 use Throwable;
-use RuntimeException;
-use Treblle\Php\FieldMasker;
-use Treblle\Php\DataTransferObject\Request;
-use Treblle\Php\DataTransferObject\Response;
-use Treblle\Php\Contract\RequestDataProvider;
+use Treblle\Php\Factory\TreblleFactory;
+use Treblle\Php\DataTransferObject\Error;
+use Treblle\Php\Contract\ErrorDataProvider;
 use Symfony\Component\HttpKernel\KernelEvents;
-use Treblle\Php\Contract\ResponseDataProvider;
 use Symfony\Component\HttpKernel\Event\KernelEvent;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
-use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpFoundation\Request as HttpRequest;
+use Treblle\Symfony\DataProviders\SymfonyRequestDataProvider;
+use Treblle\Symfony\DependencyInjection\TreblleConfiguration;
 use Symfony\Component\HttpFoundation\Response as HttpResponse;
+use Treblle\Symfony\DataProviders\SymfonyResponseDataProvider;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final class TreblleEventSubscriber implements EventSubscriberInterface, RequestDataProvider, ResponseDataProvider
+final class TreblleEventSubscriber implements EventSubscriberInterface
 {
-    private ?HttpResponse $httpResponse = null;
+    private HttpRequest $request;
 
-    private ?HttpRequest $httpRequest = null;
+    private HttpResponse $response;
 
-    private float $timestampStart = 0;
-
-    public function __construct(private FieldMasker $fieldMasker)
-    {
+    public function __construct(
+        private readonly TreblleConfiguration $configuration,
+        private readonly ErrorDataProvider    $errorDataProvider,
+    ) {
     }
 
-    /**
-     * @return array<string, string>
-     */
     public static function getSubscribedEvents(): array
     {
         return [
             KernelEvents::REQUEST => 'onKernelRequest',
             KernelEvents::RESPONSE => 'onKernelResponse',
-            KernelEvents::TERMINATE => 'onKernelTerminate',
             KernelEvents::EXCEPTION => 'onKernelException',
+            KernelEvents::TERMINATE => 'onKernelTerminate',
         ];
     }
 
@@ -52,116 +48,59 @@ final class TreblleEventSubscriber implements EventSubscriberInterface, RequestD
             $event->isMainRequest()
         ) {
             $request = $event->getRequest();
-            $this->httpRequest = $request;
+            $this->request = $request;
             $request->attributes->set('treblle_request_started_at', microtime(true));
-            $this->timestampStart = microtime(true);
         }
     }
 
     public function onKernelResponse(ResponseEvent $event): void
     {
-        $this->httpResponse = $event->getResponse();
-    }
-
-    public function getRequest(): Request
-    {
-        // TODO: By default it should be invoked, remove once confirmed
-        if (null === $this->httpRequest) {
-            throw new RuntimeException('No request available');
-        }
-
-        // TODO: Why we are getting request content here ?
-        //        try {
-        //            $requestData = $this->httpRequest->getContent() ?: '';
-        //            $requestData = json_decode($requestData, true);
-        //            $requestBody = $this->fieldMasker->mask($requestData);
-        //        } catch (Throwable $throwable) {
-        //            $requestBody = [];
-        //        }
-
-        // TODO: verify what is returned in request all does it includes query already
-        //        $requestParams = array_merge(
-        //            $this->httpRequest->request->all(),
-        //            $this->httpRequest->query->all(),
-        //        );
-
-        return new Request(
-            timestamp: gmdate('Y-m-d H:i:s'),
-            url: $this->httpRequest->getUri(),
-            ip: $this->httpRequest->getClientIp() ?: 'bogon',
-            user_agent: $this->httpRequest->headers->get('USER-AGENT', '') ?: '',
-            method: $this->httpRequest->getMethod(),
-            headers: $this->fieldMasker->mask($this->normalizeHeaders($this->httpRequest->headers->all())),
-            query: $this->fieldMasker->mask($this->httpRequest->query->all()),
-            body: $this->fieldMasker->mask($this->httpRequest->request->all()),
-            route_path: $this->httpRequest->attributes->get('_route')?->getPath() ?? null,
-        );
-    }
-
-    public function getResponse(): Response
-    {
-        // TODO: By default it should be invoked, remove once confirmed
-        if (null === $this->httpResponse) {
-            throw new RuntimeException('No response available');
-        }
-
-        $responseSize = 0;
-
-        try {
-            $content = $this->httpResponse->getContent() ?: '';
-            $responseSize = mb_strlen($content);
-            $responseBody = json_decode($content, true);
-            $responseBody = $this->fieldMasker->mask($responseBody);
-        } catch (Throwable $throwable) {
-            $responseBody = [];
-        }
-
-        // converting to milliseconds
-        $time = (float) (microtime(true) * 1000) - ($this->timestampStart * 1000);
-
-        return new Response(
-            code: $this->httpResponse->getStatusCode(),
-            size: $responseSize,
-            load_time: $time,
-            body: $this->fieldMasker->mask($responseBody),
-            headers: $this->fieldMasker->mask($this->normalizeHeaders($this->httpRequest->headers->all())),
-        );
-    }
-
-    public function onKernelTerminate(KernelEvent $event): void
-    {
-        //        try {
-        //            $this->treblle->onShutdown();
-        //        } catch (Throwable $throwable) {
-        //            $this->logger->error($throwable->getMessage());
-        //        }
+        $this->request = $event->getRequest();
+        $this->response = $event->getResponse();
     }
 
     public function onKernelException(KernelEvent $event): void
     {
-        if (! $event instanceof ExceptionEvent) {
-            return;
-        }
+        $exception = $event->getThrowable();
 
-        //        try {
-        //            $throwable = $event->getThrowable();
-        //            $this->treblle->onException($throwable);
-        //        } catch (Throwable $throwable) {
-        //            $this->logger->error($throwable->getMessage());
-        //        }
+        $this->errorDataProvider->addError(new Error(
+            message: $exception->getMessage(),
+            file: $exception->getFile(),
+            line: $exception->getLine(),
+            source: 'onException',
+            type: 'UNHANDLED_EXCEPTION',
+        ));
     }
 
     /**
-     * @param  array<string, array<string>>  $allHeaders
-     * @return array<string, string>
+     * @throws Throwable
      */
-    private function normalizeHeaders(array $allHeaders): array
+    public function onKernelTerminate(KernelEvent $event): void
     {
-        $headers = [];
-        foreach ($allHeaders as $name => $value) {
-            $headers[$name] = implode(', ', $value);
-        }
+        $requestProvider = new SymfonyRequestDataProvider($this->request, $this->configuration);
+        $responseProvider = new SymfonyResponseDataProvider($this->request, $this->response, $this->errorDataProvider, $this->configuration);
 
-        return $headers;
+        $treblle = TreblleFactory::create(
+            apiKey: (string)$this->configuration->getApiKey(),
+            projectId: (string)$this->configuration->getProjectId(),
+            debug: (bool)$this->configuration->isDebug(),
+            maskedFields: $this->configuration->getMaskedFields(),
+            config: [
+                'url' => $this->configuration->getUrl(),
+                'register_handlers' => false,
+                'fork_process' => false,
+                'request_provider' => $requestProvider,
+                'response_provider' => $responseProvider,
+                'error_provider' => $this->errorDataProvider,
+            ]
+        );
+
+        // Manually execute onShutdown because on octane server never shuts down
+        // so registered shutdown function never gets called
+        // hence we have disabled handlers using config register_handlers
+        $treblle
+            ->setName(TreblleBundle::SDK_NAME)
+            ->setVersion(TreblleBundle::SDK_VERSION)
+            ->onShutdown();
     }
 }
