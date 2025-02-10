@@ -11,6 +11,7 @@ use Treblle\Php\InMemoryErrorDataProvider;
 use Treblle\Php\Contract\ErrorDataProvider;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\RouterInterface;
+use Treblle\Symfony\Exceptions\TreblleException;
 use Symfony\Component\HttpKernel\Event\KernelEvent;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
@@ -99,6 +100,14 @@ final class TreblleEventSubscriber implements EventSubscriberInterface
 
         if (in_array($appEnvironment, $ignoredEnvironments)) {
             return;
+        }
+
+        if (null === $this->configuration->getApiKey() || '' === $this->configuration->getApiKey()) {
+            throw TreblleException::missingApiKey();
+        }
+
+        if (null === $this->configuration->getProjectId() || '' === $this->configuration->getProjectId()) {
+            throw TreblleException::missingProjectId();
         }
 
         $routePath = $this->router->getRouteCollection()->get($this->request->attributes->get('_route'))->getPath();
