@@ -16,6 +16,7 @@ final readonly class SymfonyRequestDataProvider implements RequestDataProvider
     public function __construct(
         private TreblleConfiguration $configuration,
         private HttpRequest          $request,
+        private ?string $routePath = null,
     ) {
     }
 
@@ -32,7 +33,7 @@ final readonly class SymfonyRequestDataProvider implements RequestDataProvider
             headers: $fieldMasker->mask(Normalise::headers($this->request->headers->all())),
             query: $fieldMasker->mask($this->request->query->all()),
             body: $fieldMasker->mask($this->request->request->all()),
-            route_path: $this->request->attributes->get('_route')?->getPath() ?? null,
+            route_path: $this->routePath,
         );
     }
 }

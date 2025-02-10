@@ -35,6 +35,7 @@
     "treblle/treblle-php": "^4.0.2",
     "symfony/config": "^4.4|^5.0|^6.0|^7.0",
     "symfony/console": "^4.4|^5.0|^6.0|^7.0",
+    "symfony/routing": "^4.4|^5.0|^6.0|^7.0",
     "symfony/dependency-injection": "^4.4|^5.0|^6.0|^7.0",
     "symfony/event-dispatcher": "^4.4|^5.0|^6.0|^7.0",
     "symfony/http-kernel": "^4.4|^5.0|^6.0|^7.0"

@@ -10,9 +10,11 @@ use Treblle\Php\DataTransferObject\Error;
 use Treblle\Php\InMemoryErrorDataProvider;
 use Treblle\Php\Contract\ErrorDataProvider;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\HttpKernel\Event\KernelEvent;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
+use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpFoundation\Request as HttpRequest;
 use Treblle\Symfony\DataProviders\SymfonyRequestDataProvider;
 use Treblle\Symfony\DependencyInjection\TreblleConfiguration;
@@ -30,6 +32,7 @@ final class TreblleEventSubscriber implements EventSubscriberInterface
 
     public function __construct(
         private readonly TreblleConfiguration $configuration,
+        private readonly RouterInterface $router
     ) {
         $this->errorDataProvider = new InMemoryErrorDataProvider();
     }
@@ -62,7 +65,10 @@ final class TreblleEventSubscriber implements EventSubscriberInterface
         $this->response = $event->getResponse();
     }
 
-    public function onKernelException(KernelEvent $event): void
+    /**
+     * @throws Throwable
+     */
+    public function onKernelException(ExceptionEvent $event): void
     {
         $exception = $event->getThrowable();
 
@@ -73,6 +79,14 @@ final class TreblleEventSubscriber implements EventSubscriberInterface
             source: 'onException',
             type: 'UNHANDLED_EXCEPTION',
         ));
+
+        // When exception happens,
+        // response and terminate handlers are not executed
+        // hence, we don't have access to response
+        $this->request = $event->getRequest();
+        $this->response = new HttpResponse(status: HttpResponse::HTTP_INTERNAL_SERVER_ERROR);
+
+        $this->onKernelTerminate($event);
     }
 
     /**
@@ -80,7 +94,9 @@ final class TreblleEventSubscriber implements EventSubscriberInterface
      */
     public function onKernelTerminate(KernelEvent $event): void
     {
-        $requestProvider = new SymfonyRequestDataProvider($this->configuration, $this->request);
+        $routePath = $this->router->getRouteCollection()->get($this->request->attributes->get('_route'))->getPath();
+        $requestProvider = new SymfonyRequestDataProvider($this->configuration, $this->request, $routePath);
+
         $responseProvider = new SymfonyResponseDataProvider($this->configuration, $this->request, $this->response, $this->errorDataProvider);
 
         $treblle = TreblleFactory::create(
