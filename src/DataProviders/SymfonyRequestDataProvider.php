@@ -14,8 +14,8 @@ use Treblle\Symfony\DependencyInjection\TreblleConfiguration;
 final readonly class SymfonyRequestDataProvider implements RequestDataProvider
 {
     public function __construct(
-        private HttpRequest          $request,
         private TreblleConfiguration $configuration,
+        private HttpRequest          $request,
     ) {
     }
 

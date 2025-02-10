@@ -3,8 +3,4 @@ services:
     autowire: true
     autoconfigure: true
 
-  Treblle\Symfony\DataProviders\SymfonyRequestDataProvider: ~
-  Treblle\Symfony\DataProviders\SymfonyResponseDataProvider: ~
-
-  Treblle\Php\Contract\ErrorDataProvider:
-    class: 'Treblle\Php\InMemoryErrorDataProvider'
+  Treblle\Symfony\TreblleEventSubscriber: ~

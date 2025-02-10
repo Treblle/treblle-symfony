@@ -17,10 +17,10 @@ use Symfony\Component\HttpFoundation\Response as HttpResponse;
 final class SymfonyResponseDataProvider implements ResponseDataProvider
 {
     public function __construct(
+        private TreblleConfiguration       $configuration,
         private HttpRequest                $request,
         private HttpResponse               $response,
-        private readonly ErrorDataProvider $errorDataProvider,
-        private TreblleConfiguration       $configuration,
+        private ErrorDataProvider &$errorDataProvider,
     ) {
     }
 

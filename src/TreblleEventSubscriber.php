@@ -7,6 +7,7 @@ namespace Treblle\Symfony;
 use Throwable;
 use Treblle\Php\Factory\TreblleFactory;
 use Treblle\Php\DataTransferObject\Error;
+use Treblle\Php\InMemoryErrorDataProvider;
 use Treblle\Php\Contract\ErrorDataProvider;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Event\KernelEvent;
@@ -25,10 +26,12 @@ final class TreblleEventSubscriber implements EventSubscriberInterface
 
     private HttpResponse $response;
 
+    private ErrorDataProvider $errorDataProvider;
+
     public function __construct(
         private readonly TreblleConfiguration $configuration,
-        private readonly ErrorDataProvider    $errorDataProvider,
     ) {
+        $this->errorDataProvider = new InMemoryErrorDataProvider();
     }
 
     public static function getSubscribedEvents(): array
@@ -77,8 +80,8 @@ final class TreblleEventSubscriber implements EventSubscriberInterface
      */
     public function onKernelTerminate(KernelEvent $event): void
     {
-        $requestProvider = new SymfonyRequestDataProvider($this->request, $this->configuration);
-        $responseProvider = new SymfonyResponseDataProvider($this->request, $this->response, $this->errorDataProvider, $this->configuration);
+        $requestProvider = new SymfonyRequestDataProvider($this->configuration, $this->request);
+        $responseProvider = new SymfonyResponseDataProvider($this->configuration, $this->request, $this->response, $this->errorDataProvider);
 
         $treblle = TreblleFactory::create(
             apiKey: $this->configuration->getApiKey(),
