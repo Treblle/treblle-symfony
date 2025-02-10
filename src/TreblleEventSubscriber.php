@@ -96,7 +96,6 @@ final class TreblleEventSubscriber implements EventSubscriberInterface
     {
         $routePath = $this->router->getRouteCollection()->get($this->request->attributes->get('_route'))->getPath();
         $requestProvider = new SymfonyRequestDataProvider($this->configuration, $this->request, $routePath);
-
         $responseProvider = new SymfonyResponseDataProvider($this->configuration, $this->request, $this->response, $this->errorDataProvider);
 
         $treblle = TreblleFactory::create(
