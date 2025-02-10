@@ -81,13 +81,8 @@ final class TreblleEventSubscriber implements EventSubscriberInterface
             type: 'UNHANDLED_EXCEPTION',
         ));
 
-        // When exception happens,
-        // response and terminate handlers are not executed
-        // hence, we don't have access to response
         $this->request = $event->getRequest();
         $this->response = new HttpResponse(status: HttpResponse::HTTP_INTERNAL_SERVER_ERROR);
-
-        $this->onKernelTerminate($event);
     }
 
     /**
