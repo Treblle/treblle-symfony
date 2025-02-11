@@ -27,7 +27,7 @@ final readonly class SymfonyRequestDataProvider implements RequestDataProvider
         $query = $this->request->query->all();
 
         try {
-            $body = $this->request->getContent() ?: '';
+            $body = $this->request->getContent() ?: '{}';
             $body = json_decode($body, true);
         } catch (Throwable $throwable) {
             $body = [];
