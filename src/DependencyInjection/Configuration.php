@@ -9,27 +9,24 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 final class Configuration implements ConfigurationInterface
 {
-    public function getConfigTreeBuilder()
+    public function getConfigTreeBuilder(): TreeBuilder
     {
         $treeBuilder = new TreeBuilder('treblle');
 
-        // @phpstan-ignore-next-line
-        $treeBuilder->getRootNode()
+        $treeBuilder
+            ->getRootNode()
             ->children()
-            ->scalarNode('endpoint_url')
-            ->defaultValue('https://rocknrolla.treblle.com')
-            ->end()
-            ->scalarNode('project_id')
-            ->end()
-            ->scalarNode('api_key')
-            ->end()
-            ->booleanNode('debug')
-            ->end()
-            ->arrayNode('masked')
-            ->scalarPrototype()->end()
-            ->end()
-            ->arrayNode('ignore')
-            ->scalarPrototype()->end()
+            ->scalarNode('url')->defaultNull()->end()
+            ->scalarNode('api_key')->defaultValue('')->end()
+            ->scalarNode('project_id')->defaultValue('')->end()
+            ->scalarNode('ignored_environments')->defaultValue('dev,test,testing')->end()
+            ->arrayNode('masked_fields')->scalarPrototype()->end()
+            ->defaultValue([
+                'password', 'pwd', 'secret', 'password_confirmation',
+                'cc', 'card_number', 'ccb', 'ssn', 'credit_score',
+                'api_key',
+            ])->end()
+            ->booleanNode('debug')->defaultFalse()->end()
             ->end()
             ->end();
 
