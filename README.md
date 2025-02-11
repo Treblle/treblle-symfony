@@ -98,7 +98,6 @@ treblle:
     - password
     - api_key
     - secret
-  endpoint_url: "https://rocknrolla.treblle.com" // optional
 ```
 
 > See the [docs](https://docs.treblle.com/en/integrations/symfony) for this SDK to learn more.
