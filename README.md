@@ -94,7 +94,8 @@ treblle:
   project_id: "%env(TREBLLE_PROJECT_ID)%"
   api_key: "%env(TREBLLE_API_KEY)%"
   debug: false
-  masked:
+  ignored_environments: dev
+  masked_fields:
     - password
     - api_key
     - secret
