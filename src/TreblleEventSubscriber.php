@@ -105,7 +105,13 @@ final class TreblleEventSubscriber implements EventSubscriberInterface
             throw TreblleException::missingProjectId();
         }
 
-        $routePath = $this->router->getRouteCollection()->get($this->request->attributes->get('_route'))->getPath();
+        $routePath = null;
+        $route = $this->request->attributes->get('_route');
+
+        if (is_string($route)) {
+            $routePath = $this->router->getRouteCollection()->get($this->request->attributes->get('_route'))?->getPath();
+        }
+
         $requestProvider = new SymfonyRequestDataProvider($this->configuration, $this->request, $routePath);
         $responseProvider = new SymfonyResponseDataProvider($this->configuration, $this->request, $this->response, $this->errorDataProvider);
 
