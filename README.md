@@ -75,19 +75,17 @@ This means data masking is super fast and happens on a programming level before 
 composer require treblle/treblle-symfony
 ```
 
-Enable it by adding it to the list of registered bundles depending on the Symfony version you’re using.
+Enable it by adding it to the list of registered bundles in `config/bundles.php`:
 
 ```php
 // config/bundles.php
-{
-    return [
-        // ...
-        new Treblle\Symfony\TreblleBundle(),
-    ];
-}
+return [
+    // ...
+    Treblle\Symfony\TreblleBundle::class => ['all' => true],
+];
 ```
 
-Configure the SDK by adding the following snippet to your project configuration. If you have Symfony 3.4 add it to `app/config/config_prod.yml`. For Symfony 4 or newer add the value to `config/packages/treblle.yaml`.
+Configure the SDK by adding the following snippet to `config/packages/treblle.yaml`:
 
 ```yaml
 treblle:
@@ -119,6 +117,12 @@ treblle:
 - `masked_fields` (optional): Array of field names to mask in request/response data
 - `excluded_headers` (optional): Array of header patterns to exclude from tracking
 - `url` (optional): Custom Treblle endpoint URL for self-hosted instances
+
+### Requirements
+
+- PHP 8.2, 8.3, or 8.4
+- Symfony 6.4, 7.x, or 8.x
+- JSON extension
 
 > See the [docs](https://docs.treblle.com/en/integrations/symfony) for this SDK to learn more.
 
