@@ -23,9 +23,11 @@ final class Configuration implements ConfigurationInterface
             ->arrayNode('masked_fields')->scalarPrototype()->end()
             ->defaultValue([
                 'password', 'pwd', 'secret', 'password_confirmation',
-                'cc', 'card_number', 'ccb', 'ssn', 'credit_score',
+                'cc', 'card_number', 'ccv', 'ssn', 'credit_score',
                 'api_key',
             ])->end()
+            ->arrayNode('excluded_headers')->scalarPrototype()->end()
+            ->defaultValue([])->end()
             ->booleanNode('debug')->defaultFalse()->end()
             ->end()
             ->end();

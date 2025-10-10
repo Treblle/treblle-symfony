@@ -8,6 +8,7 @@ final readonly class TreblleConfiguration
 {
     /**
      * @param array<int,string> $maskedFields
+     * @param array<int,string> $excludedHeaders
      */
     public function __construct(
         private string  $apiKey,
@@ -15,6 +16,7 @@ final readonly class TreblleConfiguration
         private ?string $url = null,
         private string  $ignoredEnvironments = 'dev,test,testing',
         private array   $maskedFields = [],
+        private array   $excludedHeaders = [],
         private bool    $debug = false,
     ) {
     }
@@ -47,5 +49,10 @@ final readonly class TreblleConfiguration
     public function getUrl(): ?string
     {
         return $this->url;
+    }
+
+    public function getExcludedHeaders(): array
+    {
+        return $this->excludedHeaders;
     }
 }

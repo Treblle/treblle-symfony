@@ -116,10 +116,11 @@ final class TreblleEventSubscriber implements EventSubscriberInterface
         $responseProvider = new SymfonyResponseDataProvider($this->configuration, $this->request, $this->response, $this->errorDataProvider);
 
         $treblle = TreblleFactory::create(
-            apiKey: $this->configuration->getApiKey(),
-            projectId: $this->configuration->getProjectId(),
+            apiKey: $this->configuration->getProjectId(),
+            sdkToken: $this->configuration->getApiKey(),
             debug: $this->configuration->isDebug(),
             maskedFields: $this->configuration->getMaskedFields(),
+            excludedHeaders: $this->configuration->getExcludedHeaders(),
             config: [
                 'url' => $this->configuration->getUrl(),
                 'register_handlers' => false,

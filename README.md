@@ -94,12 +94,32 @@ treblle:
   project_id: "%env(TREBLLE_PROJECT_ID)%"
   api_key: "%env(TREBLLE_API_KEY)%"
   debug: false
-  ignored_environments: dev
+  ignored_environments: dev,test,testing
   masked_fields:
     - password
-    - api_key
+    - pwd
     - secret
+    - password_confirmation
+    - cc
+    - card_number
+    - ccv
+    - ssn
+    - credit_score
+    - api_key
+  excluded_headers:
+    - Authorization
+    - X-Api-Key
 ```
+
+### Configuration Options
+
+- `project_id` (required): Your Treblle project ID
+- `api_key` (required): Your Treblle API key
+- `debug` (optional, default: `false`): Enable debug mode for development
+- `ignored_environments` (optional, default: `dev,test,testing`): Comma-separated list of environments to ignore
+- `masked_fields` (optional): Array of field names to mask in request/response data
+- `excluded_headers` (optional): Array of header patterns to exclude from tracking
+- `url` (optional): Custom Treblle endpoint URL for self-hosted instances
 
 > See the [docs](https://docs.treblle.com/en/integrations/symfony) for this SDK to learn more.
 
