@@ -13,8 +13,31 @@ use Symfony\Component\HttpFoundation\Request as HttpRequest;
 use Treblle\Symfony\DependencyInjection\TreblleConfiguration;
 use Symfony\Component\HttpFoundation\Response as HttpResponse;
 
+/**
+ * SymfonyResponseDataProvider extracts and formats response data from Symfony HTTP responses.
+ *
+ * This provider implements the treblle-php ResponseDataProvider contract to convert
+ * Symfony Response objects into Treblle's Response DTO format. It handles:
+ * - Status codes and headers
+ * - Response body with JSON decoding
+ * - Response size calculation
+ * - Load time measurement
+ * - Sensitive data masking
+ * - Large response handling (>2MB)
+ *
+ * @see ResponseDataProvider For the interface contract
+ * @see Response For the Treblle Response DTO
+ */
 final class SymfonyResponseDataProvider implements ResponseDataProvider
 {
+    /**
+     * Creates a new SymfonyResponseDataProvider instance.
+     *
+     * @param TreblleConfiguration $configuration Configuration for masking and settings
+     * @param HttpRequest $request The HTTP request (used for load time calculation)
+     * @param HttpResponse $response The HTTP response to extract data from
+     * @param ErrorDataProvider &$errorDataProvider Error provider for tracking issues (passed by reference)
+     */
     public function __construct(
         private TreblleConfiguration $configuration,
         private HttpRequest          $request,
@@ -23,6 +46,18 @@ final class SymfonyResponseDataProvider implements ResponseDataProvider
     ) {
     }
 
+    /**
+     * Extracts and returns the response data as a Treblle Response DTO.
+     *
+     * This method:
+     * - Extracts response body, status code, and headers
+     * - Normalizes headers from array to string format
+     * - Calculates response size and load time
+     * - Masks sensitive fields in headers and body
+     * - Handles large responses (>2MB) by truncating body
+     *
+     * @return Response The formatted response data
+     */
     public function getResponse(): Response
     {
         $masker = new SensitiveDataMasker($this->configuration->getMaskedFields());
@@ -59,6 +94,15 @@ final class SymfonyResponseDataProvider implements ResponseDataProvider
         );
     }
 
+    /**
+     * Calculates the request load time in milliseconds.
+     *
+     * This method calculates the time between when the request started and now.
+     * It prioritizes the 'treblle_request_started_at' attribute set in onKernelRequest,
+     * falling back to $_SERVER['REQUEST_TIME_FLOAT'] if the attribute is not available.
+     *
+     * @return float The load time in milliseconds
+     */
     private function getLoadTimeInMilliseconds(): float
     {
         $currentTimeInMilliseconds = microtime(true) * 1000;

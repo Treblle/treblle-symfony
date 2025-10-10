@@ -23,14 +23,45 @@ use Symfony\Component\HttpFoundation\Response as HttpResponse;
 use Treblle\Symfony\DataProviders\SymfonyResponseDataProvider;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
+/**
+ * TreblleEventSubscriber is the main event subscriber that captures API requests and sends them to Treblle.
+ *
+ * This subscriber listens to kernel events throughout the request lifecycle:
+ * - REQUEST: Captures the incoming request and tracks start time
+ * - RESPONSE: Captures the response data
+ * - EXCEPTION: Captures any unhandled exceptions that occur
+ * - TERMINATE: Sends the collected data to Treblle after response is sent to client
+ *
+ * The subscriber integrates with the Treblle PHP SDK to send API monitoring data,
+ * respecting configured masked fields, excluded headers, and ignored environments.
+ *
+ * @see TreblleConfiguration For configuration options
+ * @see SymfonyRequestDataProvider For request data extraction
+ * @see SymfonyResponseDataProvider For response data extraction
+ */
 final class TreblleEventSubscriber implements EventSubscriberInterface
 {
+    /**
+     * The captured HTTP request.
+     */
     private HttpRequest $request;
 
+    /**
+     * The captured HTTP response.
+     */
     private HttpResponse $response;
 
+    /**
+     * Provider for collecting and storing error information.
+     */
     private ErrorDataProvider $errorDataProvider;
 
+    /**
+     * Creates a new TreblleEventSubscriber instance.
+     *
+     * @param TreblleConfiguration $configuration The Treblle configuration
+     * @param RouterInterface $router The Symfony router for route path extraction
+     */
     public function __construct(
         private readonly TreblleConfiguration $configuration,
         private readonly RouterInterface $router
@@ -38,6 +69,17 @@ final class TreblleEventSubscriber implements EventSubscriberInterface
         $this->errorDataProvider = new InMemoryErrorDataProvider();
     }
 
+    /**
+     * Returns an array of event names this subscriber listens to.
+     *
+     * Maps kernel events to their respective handler methods:
+     * - REQUEST → onKernelRequest
+     * - RESPONSE → onKernelResponse
+     * - EXCEPTION → onKernelException
+     * - TERMINATE → onKernelTerminate
+     *
+     * @return array<string, string> Event names mapped to handler methods
+     */
     public static function getSubscribedEvents(): array
     {
         return [
@@ -48,6 +90,16 @@ final class TreblleEventSubscriber implements EventSubscriberInterface
         ];
     }
 
+    /**
+     * Handles the kernel.request event.
+     *
+     * Captures the incoming HTTP request and records the request start time
+     * for accurate load time calculation. Only processes main requests, not sub-requests.
+     *
+     * @param RequestEvent $event The request event
+     *
+     * @return void
+     */
     public function onKernelRequest(RequestEvent $event): void
     {
         if (
@@ -60,6 +112,16 @@ final class TreblleEventSubscriber implements EventSubscriberInterface
         }
     }
 
+    /**
+     * Handles the kernel.response event.
+     *
+     * Captures the HTTP request and response objects for later processing
+     * when sending data to Treblle.
+     *
+     * @param ResponseEvent $event The response event
+     *
+     * @return void
+     */
     public function onKernelResponse(ResponseEvent $event): void
     {
         $this->request = $event->getRequest();
@@ -67,7 +129,17 @@ final class TreblleEventSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @throws Throwable
+     * Handles the kernel.exception event.
+     *
+     * Captures any unhandled exceptions that occur during request processing
+     * and stores them for reporting to Treblle. Creates a 500 Internal Server Error
+     * response for Treblle tracking purposes.
+     *
+     * @param ExceptionEvent $event The exception event
+     *
+     * @throws Throwable If the exception cannot be handled
+     *
+     * @return void
      */
     public function onKernelException(ExceptionEvent $event): void
     {
@@ -86,7 +158,26 @@ final class TreblleEventSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @throws Throwable
+     * Handles the kernel.terminate event.
+     *
+     * This is the main method that sends data to Treblle after the response has been sent to the client.
+     * It performs the following steps:
+     * 1. Checks if current environment should be ignored
+     * 2. Validates API credentials are configured
+     * 3. Extracts route path from the request
+     * 4. Creates data providers for request and response
+     * 5. Initializes Treblle SDK and sends the data
+     *
+     * This method is called after the response is sent to the client, ensuring
+     * no impact on response time. It's also compatible with long-running processes
+     * like Octane where shutdown handlers may not be called.
+     *
+     * @param KernelEvent $event The terminate event
+     *
+     * @throws Throwable If data cannot be sent to Treblle
+     * @throws TreblleException If API key or SDK token is missing
+     *
+     * @return void
      */
     public function onKernelTerminate(KernelEvent $event): void
     {
