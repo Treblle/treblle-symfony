@@ -101,8 +101,8 @@ final class TreblleEventSubscriber implements EventSubscriberInterface
             throw TreblleException::missingApiKey();
         }
 
-        if (null === $this->configuration->getProjectId() || '' === $this->configuration->getProjectId()) {
-            throw TreblleException::missingProjectId();
+        if (null === $this->configuration->getSdkToken() || '' === $this->configuration->getSdkToken()) {
+            throw TreblleException::missingSdkToken();
         }
 
         $routePath = null;
@@ -116,8 +116,8 @@ final class TreblleEventSubscriber implements EventSubscriberInterface
         $responseProvider = new SymfonyResponseDataProvider($this->configuration, $this->request, $this->response, $this->errorDataProvider);
 
         $treblle = TreblleFactory::create(
-            apiKey: $this->configuration->getProjectId(),
-            sdkToken: $this->configuration->getApiKey(),
+            apiKey: $this->configuration->getApiKey(),
+            sdkToken: $this->configuration->getSdkToken(),
             debug: $this->configuration->isDebug(),
             maskedFields: $this->configuration->getMaskedFields(),
             excludedHeaders: $this->configuration->getExcludedHeaders(),

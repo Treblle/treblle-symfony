@@ -12,7 +12,7 @@ final readonly class TreblleConfiguration
      */
     public function __construct(
         private string  $apiKey,
-        private string  $projectId,
+        private string  $sdkToken,
         private ?string $url = null,
         private string  $ignoredEnvironments = 'dev,test,testing',
         private array   $maskedFields = [],
@@ -26,9 +26,9 @@ final readonly class TreblleConfiguration
         return $this->apiKey;
     }
 
-    public function getProjectId(): string
+    public function getSdkToken(): string
     {
-        return $this->projectId;
+        return $this->sdkToken;
     }
 
     public function getIgnoredEnvironments(): string

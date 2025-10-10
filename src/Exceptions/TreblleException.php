@@ -15,10 +15,10 @@ final class TreblleException extends Exception
         );
     }
 
-    public static function missingProjectId(): self
+    public static function missingSdkToken(): self
     {
         return new TreblleException(
-            message: 'No Project Id configured for Treblle. Ensure this is set in your .env before trying again.',
+            message: 'No SDK Token configured for Treblle. Ensure this is set in your .env before trying again.',
         );
     }
 }

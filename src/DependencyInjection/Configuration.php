@@ -18,13 +18,12 @@ final class Configuration implements ConfigurationInterface
             ->children()
             ->scalarNode('url')->defaultNull()->end()
             ->scalarNode('api_key')->defaultValue('')->end()
-            ->scalarNode('project_id')->defaultValue('')->end()
+            ->scalarNode('sdk_token')->defaultValue('')->end()
             ->scalarNode('ignored_environments')->defaultValue('dev,test,testing')->end()
             ->arrayNode('masked_fields')->scalarPrototype()->end()
             ->defaultValue([
                 'password', 'pwd', 'secret', 'password_confirmation',
                 'cc', 'card_number', 'ccv', 'ssn', 'credit_score',
-                'api_key',
             ])->end()
             ->arrayNode('excluded_headers')->scalarPrototype()->end()
             ->defaultValue([])->end()

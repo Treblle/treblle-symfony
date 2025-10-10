@@ -4,11 +4,10 @@ declare(strict_types=1);
 
 namespace Treblle\Symfony\DataProviders;
 
-use Treblle\Php\FieldMasker;
-use Treblle\Symfony\Helpers\Normalise;
 use Treblle\Php\DataTransferObject\Error;
 use Treblle\Php\Contract\ErrorDataProvider;
 use Treblle\Php\DataTransferObject\Response;
+use Treblle\Php\Helpers\SensitiveDataMasker;
 use Treblle\Php\Contract\ResponseDataProvider;
 use Symfony\Component\HttpFoundation\Request as HttpRequest;
 use Treblle\Symfony\DependencyInjection\TreblleConfiguration;
@@ -26,7 +25,7 @@ final class SymfonyResponseDataProvider implements ResponseDataProvider
 
     public function getResponse(): Response
     {
-        $fieldMasker = new FieldMasker($this->configuration->getMaskedFields());
+        $masker = new SensitiveDataMasker($this->configuration->getMaskedFields());
 
         $body = $this->response->getContent();
         $size = mb_strlen($body);
@@ -43,14 +42,20 @@ final class SymfonyResponseDataProvider implements ResponseDataProvider
             ));
         }
 
+        // Normalize headers from array format to string format
+        $headers = [];
+        foreach ($this->response->headers->all() as $name => $value) {
+            $headers[$name] = implode(', ', $value);
+        }
+
         return new Response(
             code: $this->response->getStatusCode(),
             size: $size,
             load_time: $this->getLoadTimeInMilliseconds(),
-            body: $fieldMasker->mask(
+            body: $masker->mask(
                 json_decode($body, true) ?? []
             ),
-            headers: $fieldMasker->mask(Normalise::headers($this->response->headers->all())),
+            headers: $masker->mask($headers),
         );
     }
 

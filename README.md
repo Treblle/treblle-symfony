@@ -91,8 +91,8 @@ Configure the SDK by adding the following snippet to your project configuration.
 
 ```yaml
 treblle:
-  project_id: "%env(TREBLLE_PROJECT_ID)%"
   api_key: "%env(TREBLLE_API_KEY)%"
+  sdk_token: "%env(TREBLLE_SDK_TOKEN)%"
   debug: false
   ignored_environments: dev,test,testing
   masked_fields:
@@ -105,7 +105,6 @@ treblle:
     - ccv
     - ssn
     - credit_score
-    - api_key
   excluded_headers:
     - Authorization
     - X-Api-Key
@@ -113,8 +112,8 @@ treblle:
 
 ### Configuration Options
 
-- `project_id` (required): Your Treblle project ID
-- `api_key` (required): Your Treblle API key
+- `api_key` (required): Your Treblle API key (project ID)
+- `sdk_token` (required): Your Treblle SDK token
 - `debug` (optional, default: `false`): Enable debug mode for development
 - `ignored_environments` (optional, default: `dev,test,testing`): Comma-separated list of environments to ignore
 - `masked_fields` (optional): Array of field names to mask in request/response data
