@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Treblle\Symfony\DependencyInjection;
 
+use Exception;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -34,6 +35,7 @@ final class TreblleExtension extends Extension
      * @param ContainerBuilder $container The service container builder
      *
      * @return void
+     * @throws Exception
      */
     public function load(array $configs, ContainerBuilder $container): void
     {

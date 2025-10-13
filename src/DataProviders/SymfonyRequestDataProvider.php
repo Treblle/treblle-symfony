@@ -67,10 +67,7 @@ final readonly class SymfonyRequestDataProvider implements RequestDataProvider
         }
 
         // Normalize headers from array format to string format
-        $headers = [];
-        foreach ($this->request->headers->all() as $name => $value) {
-            $headers[$name] = implode(', ', $value);
-        }
+        $headers = array_map(fn ($value) => is_array($value) ? implode(', ', $value) : $value, $this->response->headers->all());
 
         return new Request(
             timestamp: gmdate('Y-m-d H:i:s'),

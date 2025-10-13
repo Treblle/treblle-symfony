@@ -28,7 +28,7 @@ use Symfony\Component\HttpFoundation\Response as HttpResponse;
  * @see ResponseDataProvider For the interface contract
  * @see Response For the Treblle Response DTO
  */
-final class SymfonyResponseDataProvider implements ResponseDataProvider
+final readonly class SymfonyResponseDataProvider implements ResponseDataProvider
 {
     /**
      * Creates a new SymfonyResponseDataProvider instance.
@@ -78,10 +78,7 @@ final class SymfonyResponseDataProvider implements ResponseDataProvider
         }
 
         // Normalize headers from array format to string format
-        $headers = [];
-        foreach ($this->response->headers->all() as $name => $value) {
-            $headers[$name] = implode(', ', $value);
-        }
+        $headers = array_map(fn ($value) => is_array($value) ? implode(', ', $value) : $value, $this->response->headers->all());
 
         return new Response(
             code: $this->response->getStatusCode(),
