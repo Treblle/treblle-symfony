@@ -54,6 +54,7 @@ final class TreblleExtension extends Extension
             '$maskedFields' => (array)$config['masked_fields'],
             '$excludedHeaders' => (array)$config['excluded_headers'],
             '$debug' => (bool)$config['debug'],
+            '$queueEnabled' => (bool) $config['queue_enabled']
         ]);
 
         $container->setDefinition(TreblleConfiguration::class, $definition);

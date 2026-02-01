@@ -47,6 +47,7 @@ final class Configuration implements ConfigurationInterface
             ->arrayNode('excluded_headers')->scalarPrototype()->end()
             ->defaultValue([])->end()
             ->booleanNode('debug')->defaultFalse()->end()
+            ->booleanNode('queue_enabled')->defaultFalse()->end()
             ->end()
             ->end();
 

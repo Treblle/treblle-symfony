@@ -4,3 +4,10 @@ services:
     autoconfigure: true
 
   Treblle\Symfony\TreblleEventSubscriber: ~
+
+#  Bind Queue Message and Message Handler to container
+  Treblle\Symfony\Message\TransmitTreblleData:
+    class: Treblle\Symfony\Message\TransmitTreblleData
+
+  Treblle\Symfony\MessageHandler\TransmitTreblleDataHandler:
+    class: Treblle\Symfony\MessageHandler\TransmitTreblleDataHandler

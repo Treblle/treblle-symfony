@@ -38,7 +38,9 @@
     "symfony/routing": "^6.4|^7.0|^8.0",
     "symfony/dependency-injection": "^6.4|^7.0|^8.0",
     "symfony/event-dispatcher": "^6.4|^7.0|^8.0",
-    "symfony/http-kernel": "^6.4|^7.0|^8.0"
+    "symfony/http-kernel": "^6.4|^7.0|^8.0",
+    "symfony/messenger": "^6.4|^7.0|^8.0",
+    "symfony/http-client": "^6.4|^7.0|^8.0"
   },
   "require-dev": {
     "laravel/pint": "^1.15"

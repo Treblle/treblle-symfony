@@ -34,6 +34,7 @@ final readonly class TreblleConfiguration
         private array   $maskedFields = [],
         private array   $excludedHeaders = [],
         private bool    $debug = false,
+        private bool $queueEnabled = false,
     ) {
     }
 
@@ -105,5 +106,15 @@ final readonly class TreblleConfiguration
     public function getExcludedHeaders(): array
     {
         return $this->excludedHeaders;
+    }
+
+    /**
+     * Returns whether queue transmission is enabled.
+     *
+     * @return bool True if debug mode is enabled, false otherwise
+     */
+    public function isQueueEnabled(): bool
+    {
+        return $this->queueEnabled;
     }
 }

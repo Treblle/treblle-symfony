@@ -4,12 +4,19 @@ declare(strict_types=1);
 
 namespace Treblle\Symfony;
 
+use Psr\Log\LoggerInterface;
+use Symfony\Component\Messenger\Exception\ExceptionInterface;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Throwable;
+use Treblle\Php\DataProviders\PhpLanguageDataProvider;
+use Treblle\Php\DataProviders\SuperGlobalsServerDataProvider;
+use Treblle\Php\DataTransferObject\Data;
 use Treblle\Php\Factory\TreblleFactory;
 use Treblle\Php\DataTransferObject\Error;
 use Treblle\Php\Contract\ErrorDataProvider;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\RouterInterface;
+use Treblle\Symfony\DataTransferObjects\TrebllePayloadData;
 use Treblle\Symfony\Exceptions\TreblleException;
 use Symfony\Component\HttpKernel\Event\KernelEvent;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
@@ -22,6 +29,7 @@ use Treblle\Symfony\DependencyInjection\TreblleConfiguration;
 use Symfony\Component\HttpFoundation\Response as HttpResponse;
 use Treblle\Symfony\DataProviders\SymfonyResponseDataProvider;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Treblle\Symfony\Message\TransmitTreblleData;
 
 /**
  * TreblleEventSubscriber is the main event subscriber that captures API requests and sends them to Treblle.
@@ -64,7 +72,9 @@ final class TreblleEventSubscriber implements EventSubscriberInterface
      */
     public function __construct(
         private readonly TreblleConfiguration $configuration,
-        private readonly RouterInterface $router
+        private readonly RouterInterface $router,
+        private MessageBusInterface $messageBus,
+        private LoggerInterface $logger,
     ) {
         $this->errorDataProvider = new InMemoryErrorDataProvider();
     }
@@ -196,12 +206,61 @@ final class TreblleEventSubscriber implements EventSubscriberInterface
             throw TreblleException::missingSdkToken();
         }
 
-        $routePath = null;
-        $route = $this->request->attributes->get('_route');
+        if($this->configuration->isQueueEnabled()) {
+            $this->dispatchToQueue();
 
-        if (is_string($route)) {
-            $routePath = $this->router->getRouteCollection()->get($this->request->attributes->get('_route'))?->getPath();
+            return;
         }
+
+        $this->sendSync();
+    }
+
+    /**
+     * Dispatch Treblle data to queue for background processing.
+     */
+    private function dispatchToQueue(): void
+    {
+        $routePath = $this->getRoutePath();
+
+        // Extract data from Request/Response BEFORE queuing to avoid serialization issues
+        $errorProvider = new InMemoryErrorDataProvider();
+        $requestProvider = new SymfonyRequestDataProvider($this->configuration, $this->request, $routePath);
+        $responseProvider = new SymfonyResponseDataProvider($this->configuration, $this->request, $this->response, $this->errorDataProvider);
+
+        // Use core SDK providers for Server and Language data
+        $serverProvider = new SuperGlobalsServerDataProvider();
+        $languageProvider = new PhpLanguageDataProvider();
+
+
+        $payloadData = new TrebllePayloadData(
+            apiKey: $this->configuration->getApiKey(),
+            sdkToken: $this->configuration->getSdkToken(),
+            debug: $this->configuration->isDebug(),
+            sdkName: TreblleBundle::SDK_NAME,
+            sdkVersion: TreblleBundle::SDK_VERSION,
+            url: $this->configuration->getUrl(),
+            data: new Data(
+                $serverProvider->getServer(),
+                $languageProvider->getLanguage(),
+                $requestProvider->getRequest(),
+                $responseProvider->getResponse(),
+                $errorProvider->getErrors()
+            )
+        );
+
+        try {
+            $this->messageBus->dispatch(new TransmitTreblleData($payloadData));
+        } catch (ExceptionInterface $e) {
+            $this->logger->error(sprintf('[TREBLLE] Treblle queue dispatch failed. Error %s', $e->getMessage()));
+        }
+    }
+
+    /**
+     * Send Treblle data synchronously using the core SDK.
+     */
+    private function sendSync(): void
+    {
+        $routePath = $this->getRoutePath();
 
         $requestProvider = new SymfonyRequestDataProvider($this->configuration, $this->request, $routePath);
         $responseProvider = new SymfonyResponseDataProvider($this->configuration, $this->request, $this->response, $this->errorDataProvider);
@@ -229,5 +288,20 @@ final class TreblleEventSubscriber implements EventSubscriberInterface
             ->setName(TreblleBundle::SDK_NAME)
             ->setVersion(TreblleBundle::SDK_VERSION)
             ->onShutdown();
+    }
+
+    /**
+     * Returns current request's route path
+     */
+    private function getRoutePath(): string
+    {
+        $routePath = null;
+        $route = $this->request->attributes->get('_route');
+
+        if (is_string($route)) {
+            $routePath = $this->router->getRouteCollection()->get($this->request->attributes->get('_route'))?->getPath();
+        }
+
+        return $routePath;
     }
 }

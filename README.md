@@ -126,6 +126,59 @@ treblle:
 
 > See the [docs](https://docs.treblle.com/en/integrations/symfony) for this SDK to learn more.
 
+### Queue Support
+Symfony sdk now support Messanger to send queued messages
+To enable queued transmissions add `queue_enabled: true` to treblle config file.
+After adding, file should look like this
+
+```yaml
+treblle:
+  api_key: "%env(TREBLLE_API_KEY)%"
+  sdk_token: "%env(TREBLLE_SDK_TOKEN)%"
+  debug: false
+  ignored_environments: dev,test,testing
+  masked_fields:
+    - password
+    - pwd
+    - secret
+    - password_confirmation
+    - cc
+    - card_number
+    - ccv
+    - ssn
+    - credit_score
+  excluded_headers:
+    - Authorization
+    - X-Api-Key
+  queue_enabled: true
+```
+
+Additionally, it is necessary to add treblle transport to messanger.yaml file
+
+```yaml
+framework:
+    messenger:
+       # Uncomment this (and the failed transport below) to send failed messages to this transport for later handling.
+       # failure_transport: failed
+
+       transports:
+          # https://symfony.com/doc/current/messenger.html#transport-configuration
+          # async: '%env(MESSENGER_TRANSPORT_DSN)%'
+          # failed: 'doctrine://default?queue_name=failed'
+          sync: 'sync://'
+          treblle: "%env(MESSENGER_TRANSPORT_DSN)%"
+```
+Run `php bin/console debug:messenger` to confirm that new Message and Handler are added, you should see
+```
+Treblle\Symfony\Message\TransmitTreblleData                                                             
+      handled by Treblle\Symfony\MessageHandler\TransmitTreblleDataHandler (when from_transport=treblle)
+```
+
+If new pair shows, then Treblle queued transmission is configured and ready to go.
+
+This will enable Treblle transmissions to run asynchronously, but actual transmission flow will depend on type of Messenger
+included in project (Redis is recommended).
+
 ## Available SDKs
 
 Treblle provides [open-source SDKs](https://docs.treblle.com/en/integrations) that let you seamlessly integrate Treblle with your REST-based APIs.
