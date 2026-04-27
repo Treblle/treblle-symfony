@@ -85,7 +85,7 @@ final class SymfonyResponseDataProvider implements ResponseDataProvider
             size: $size,
             load_time: $this->getLoadTimeInMilliseconds(),
             body: $masker->mask(
-                json_decode($body, true) ?? []
+                is_array($decoded = json_decode($body, true)) ? $decoded : []
             ),
             headers: $masker->mask($headers),
         );
