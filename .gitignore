@@ -1,4 +1,6 @@
 /vendor
-/tools/phpunit/.phpunit.result.cache
-composer.lock
+/.phpunit.result.cache
+phpunit.xml
 /.idea
+/.vscode
+.DS_Store
