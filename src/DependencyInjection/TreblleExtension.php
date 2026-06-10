@@ -54,7 +54,7 @@ final class TreblleExtension extends Extension implements PrependExtensionInterf
         ]);
         $container->setDefinition(\Treblle\Symfony\Masking\DataMasker::class, $dataMasker);
 
-        if (class_exists(\Doctrine\DBAL\Driver\Middleware::class)) {
+        if (interface_exists(\Doctrine\DBAL\Driver\Middleware::class)) {
             $middleware = new Definition(TreblleMiddleware::class);
             $middleware->setArguments([new Reference(QueryCollector::class)]);
             $middleware->addTag('doctrine.middleware');
