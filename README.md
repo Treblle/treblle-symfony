@@ -259,6 +259,88 @@ If `async: true` is set but `symfony/messenger` is not installed, the SDK silent
 
 ---
 
+## Migrating from v3 to v4
+
+### 1. Update the package
+
+```bash
+composer require treblle/treblle-symfony:^4.0
+```
+
+### 2. Update your config file
+
+The following keys changed in `config/packages/treblle.yaml`:
+
+| v3 key | v4 key | Notes |
+|---|---|---|
+| `masked_fields` | `masked_keywords` | Renamed |
+| `url` | `ingress_url` | Renamed |
+| `ignored_environments` | _(removed)_ | Use `enabled` instead (see below) |
+| `debug` | _(removed)_ | Use Monolog `treblle` channel instead |
+| `excluded_headers` | `excluded_paths` | Different concept - now excludes by path, not header name |
+
+**Before (v3):**
+
+```yaml
+treblle:
+  api_key: "%env(TREBLLE_API_KEY)%"
+  sdk_token: "%env(TREBLLE_SDK_TOKEN)%"
+  debug: false
+  ignored_environments: dev,test,testing
+  masked_fields:
+    - password
+    - secret
+  excluded_headers:
+    - Authorization
+  url: "https://custom.treblle.com"
+```
+
+**After (v4):**
+
+```yaml
+treblle:
+  api_key: "%env(TREBLLE_API_KEY)%"
+  sdk_token: "%env(TREBLLE_SDK_TOKEN)%"
+  masked_keywords:
+    - password
+    - secret
+  excluded_paths:
+    - admin/*
+  ingress_url: "https://custom.treblle.com"
+```
+
+### 3. Replace `ignored_environments` with `enabled`
+
+v4 has no `ignored_environments` option. Instead, disable Treblle per environment using Symfony's standard config override mechanism:
+
+```yaml
+# config/packages/dev/treblle.yaml
+treblle:
+  enabled: false
+```
+
+```yaml
+# config/packages/test/treblle.yaml
+treblle:
+  enabled: false
+```
+
+### 4. Remove the `debug` key
+
+The `debug` flag no longer exists. Log output is controlled entirely through your `monolog.yaml` configuration via the `treblle` channel. See the [SDK Log Events](#sdk-log-events) section for details.
+
+### 5. Review `excluded_headers` vs `excluded_paths`
+
+`excluded_headers` (v3) excluded specific header names from being tracked. `excluded_paths` (v4) excludes entire request paths from being tracked. These are different concepts - if you were using `excluded_headers`, review whether `excluded_paths` covers your use case, and use `masked_keywords` if you need to hide sensitive header values.
+
+### 6. Clear your cache
+
+```bash
+php bin/console cache:clear
+```
+
+---
+
 ## SDK Log Events
 
 The SDK logs through Symfony's standard logging system using a dedicated `treblle` Monolog channel. There is no separate debug flag - log visibility is controlled entirely by your existing `monolog.yaml` configuration, exactly as you would for any other Symfony component.
@@ -306,7 +388,6 @@ monolog:
 ```
 
 ---
-
 
 ## License
 
