@@ -1,57 +1,81 @@
 {
-  "name": "treblle/treblle-symfony",
-  "description": "Stay in tune with your APIs",
-  "license": "MIT",
-  "homepage": "https://treblle.com/",
-  "type": "library",
-  "keywords": [
-    "treblle",
-    "api",
-    "monitoring",
-    "debuging",
-    "documentation"
-  ],
-  "authors": [
-    {
-      "name": "Vedran Cindrić",
-      "email": "vedran@treblle.com",
-      "homepage": "https://treblle.com/",
-      "role": "Developer"
+    "name": "treblle/treblle-symfony",
+    "description": "Runtime Intelligence Platform",
+    "license": "MIT",
+    "homepage": "https://treblle.com/",
+    "type": "library",
+    "keywords": [
+        "treblle",
+        "intelligence",
+        "runtime",
+        "monitoring",
+        "observability",
+        "symfony",
+        "php",
+        "analytics",
+        "governance",
+        "logs"
+    ],
+    "authors": [
+        {
+            "role": "Developer",
+            "name": "Vedran Cindric",
+            "email": "vedran@treblle.com",
+            "homepage": "https://treblle.com/"
+        }
+    ],
+    "require": {
+        "php": "^8.2|^8.3|^8.4",
+        "ext-curl": "*",
+        "ext-json": "*",
+        "ext-zlib": "*",
+        "psr/log": "^1|^2|^3",
+        "symfony/config": "^6.4|^7.0|^8.0",
+        "symfony/dependency-injection": "^6.4|^7.0|^8.0",
+        "symfony/event-dispatcher": "^6.4|^7.0|^8.0",
+        "symfony/http-kernel": "^6.4|^7.0|^8.0",
+        "symfony/routing": "^6.4|^7.0|^8.0"
+    },
+    "require-dev": {
+        "laravel/pint": "^1.15",
+        "phpunit/phpunit": "^11.0"
+    },
+    "suggest": {
+        "doctrine/dbal": "Required to capture SQL queries in the Treblle payload (^3.3)",
+        "symfony/messenger": "Required for async mode — dispatches payloads via a background worker instead of inline (^6.4|^7.0|^8.0)"
+    },
+    "autoload": {
+        "psr-4": {
+            "Treblle\\Symfony\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Treblle\\Symfony\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "symfony": {
+            "require": "^6.4|^7.0|^8.0"
+        }
+    },
+    "support": {
+        "issues": "https://github.com/Treblle/treblle-symfony/issues",
+        "source": "https://github.com/Treblle/treblle-symfony",
+        "docs": "https://docs.treblle.com"
+    },
+    "config": {
+        "preferred-install": "dist",
+        "sort-packages": true
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "scripts": {
+        "pint": [
+            "./vendor/bin/pint"
+        ],
+        "test": [
+            "./vendor/bin/phpunit"
+        ]
     }
-  ],
-  "autoload": {
-    "psr-4": {
-      "Treblle\\Symfony\\": "src/"
-    }
-  },
-  "autoload-dev": {
-    "psr-4": {
-      "Treblle\\Symfony\\Tests\\": "tests/"
-    }
-  },
-  "require": {
-    "ext-json": "*",
-    "php": "^8.2|^8.3|^8.4",
-    "treblle/treblle-php": "^5.0",
-    "symfony/config": "^6.4|^7.0|^8.0",
-    "symfony/console": "^6.4|^7.0|^8.0",
-    "symfony/routing": "^6.4|^7.0|^8.0",
-    "symfony/dependency-injection": "^6.4|^7.0|^8.0",
-    "symfony/event-dispatcher": "^6.4|^7.0|^8.0",
-    "symfony/http-kernel": "^6.4|^7.0|^8.0"
-  },
-  "require-dev": {
-    "laravel/pint": "^1.15"
-  },
-  "config": {
-    "preferred-install": "dist",
-    "sort-packages": true
-  },
-  "minimum-stability": "stable",
-  "prefer-stable": true,
-  "scripts": {
-    "pint": [
-      "./vendor/bin/pint"
-    ]
-  }
 }

@@ -4,39 +4,29 @@ declare(strict_types=1);
 
 namespace Treblle\Symfony\DependencyInjection;
 
-use Exception;
 use Symfony\Component\Config\FileLocator;
-use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Extension\Extension;
+use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
+use Symfony\Component\DependencyInjection\Reference;
+use Treblle\Symfony\Doctrine\QueryCollector;
+use Treblle\Symfony\Doctrine\TreblleMiddleware;
+use Treblle\Symfony\Http\TreblleClient;
+use Treblle\Symfony\Messenger\SendTrebllePayloadHandler;
+use Treblle\Symfony\TreblleEventSubscriber;
 
-/**
- * TreblleExtension loads and processes the Treblle bundle configuration.
- *
- * This extension:
- * - Loads the service definitions from services.yaml
- * - Processes the configuration tree defined in Configuration class
- * - Creates and registers the TreblleConfiguration service with resolved values
- *
- * @see Configuration For the configuration tree definition
- * @see TreblleConfiguration For the resulting configuration value object
- */
-final class TreblleExtension extends Extension
+final class TreblleExtension extends Extension implements PrependExtensionInterface
 {
-    /**
-     * Loads the Treblle bundle configuration and services.
-     *
-     * Processes the configuration from config/packages/treblle.yaml,
-     * validates it against the configuration tree, and registers
-     * the TreblleConfiguration service with the resolved values.
-     *
-     * @param array<int, array<string, mixed>> $configs Raw configuration arrays from YAML
-     * @param ContainerBuilder $container The service container builder
-     *
-     * @return void
-     * @throws Exception
-     */
+    public function prepend(ContainerBuilder $container): void
+    {
+        if ($container->hasExtension('monolog')) {
+            $container->prependExtensionConfig('monolog', ['channels' => ['treblle']]);
+        }
+    }
+
     public function load(array $configs, ContainerBuilder $container): void
     {
         $loader = new YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
@@ -47,15 +37,46 @@ final class TreblleExtension extends Extension
 
         $definition = new Definition(TreblleConfiguration::class);
         $definition->setArguments([
-            '$apiKey' => $config['api_key'] ?? '',
             '$sdkToken' => $config['sdk_token'] ?? '',
-            '$url' => $config['url'],
-            '$ignoredEnvironments' => $config['ignored_environments'],
-            '$maskedFields' => (array)$config['masked_fields'],
-            '$excludedHeaders' => (array)$config['excluded_headers'],
-            '$debug' => (bool)$config['debug'],
+            '$apiKey' => $config['api_key'] ?? '',
+            '$enabled' => (bool) ($config['enabled'] ?? true),
+            '$maskedKeywords' => (array) ($config['masked_keywords'] ?? []),
+            '$excludedPaths' => (array) ($config['excluded_paths'] ?? []),
+            '$ingressUrl' => $config['ingress_url'] ?? 'https://ingress.treblle.com',
+            '$async' => (bool) ($config['async'] ?? false),
         ]);
 
         $container->setDefinition(TreblleConfiguration::class, $definition);
+
+        $dataMasker = new Definition(\Treblle\Symfony\Masking\DataMasker::class);
+        $dataMasker->setArguments([
+            '$maskedKeys' => (array) ($config['masked_keywords'] ?? []),
+        ]);
+        $container->setDefinition(\Treblle\Symfony\Masking\DataMasker::class, $dataMasker);
+
+        if (interface_exists(\Doctrine\DBAL\Driver\Middleware::class)) {
+            $middleware = new Definition(TreblleMiddleware::class);
+            $middleware->setArguments([new Reference(QueryCollector::class)]);
+            $middleware->addTag('doctrine.middleware');
+            $container->setDefinition(TreblleMiddleware::class, $middleware);
+        }
+
+        if (($config['async'] ?? false) && interface_exists('Symfony\Component\Messenger\MessageBusInterface')) {
+            $container->getDefinition(TreblleEventSubscriber::class)
+                ->addMethodCall('setMessageBus', [new Reference('Symfony\Component\Messenger\MessageBusInterface')]);
+
+            $handler = new Definition(SendTrebllePayloadHandler::class);
+            $handler->setArguments([new Reference(TreblleClient::class)]);
+            $handler->addTag('messenger.message_handler');
+            $container->setDefinition(SendTrebllePayloadHandler::class, $handler);
+        }
+
+        $loggerServiceId = $container->hasExtension('monolog') ? 'monolog.logger.treblle' : 'logger';
+        $loggerRef = new Reference($loggerServiceId, ContainerInterface::NULL_ON_INVALID_REFERENCE);
+
+        $container->getDefinition(TreblleEventSubscriber::class)
+            ->setArgument('$logger', $loggerRef);
+        $container->getDefinition(TreblleClient::class)
+            ->setArgument('$logger', $loggerRef);
     }
 }

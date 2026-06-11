@@ -1,6 +1,18 @@
 services:
-  _defaults:
-    autowire: true
-    autoconfigure: true
+    _defaults:
+        autowire: true
+        autoconfigure: true
 
-  Treblle\Symfony\TreblleEventSubscriber: ~
+    Treblle\Symfony\TreblleEventSubscriber: ~
+
+    Treblle\Symfony\Http\CircuitBreaker: ~
+
+    Treblle\Symfony\Http\TreblleClient: ~
+
+    Treblle\Symfony\Http\TreblleClientInterface: '@Treblle\Symfony\Http\TreblleClient'
+
+    Treblle\Symfony\Payload\PayloadBuilder: ~
+
+    Treblle\Symfony\Routing\PathMatcher: ~
+
+    Treblle\Symfony\Doctrine\QueryCollector: ~
