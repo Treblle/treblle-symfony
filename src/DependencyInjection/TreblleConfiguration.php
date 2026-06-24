@@ -14,7 +14,9 @@ final readonly class TreblleConfiguration
         private array $excludedPaths = [],
         private string $ingressUrl = 'https://ingress.treblle.com',
         private bool $async = false,
-    ) {}
+        private array $metadata = [],
+    ) {
+    }
 
     public function isEnabled(): bool
     {
@@ -49,5 +51,10 @@ final readonly class TreblleConfiguration
     public function isAsync(): bool
     {
         return $this->async;
+    }
+
+    public function getMetadata(): array
+    {
+        return $this->metadata;
     }
 }

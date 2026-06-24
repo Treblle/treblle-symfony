@@ -15,7 +15,8 @@ final class TreblleClient implements TreblleClientInterface
         private readonly TreblleConfiguration $configuration,
         private readonly CircuitBreaker $circuitBreaker,
         private readonly LoggerInterface $logger = new NullLogger(),
-    ) {}
+    ) {
+    }
 
     public function send(array $payload): void
     {

@@ -59,6 +59,12 @@ final class Configuration implements ConfigurationInterface
                     ->defaultFalse()
                     ->info('Dispatch payloads via Symfony Messenger instead of sending inline. Requires symfony/messenger with a Redis or AMQP transport.')
                 ->end()
+                ->arrayNode('metadata')
+                    ->normalizeKeys(false)
+                    ->variablePrototype()->end()
+                    ->defaultValue([])
+                    ->info('Static key-value pairs attached to every request payload under data.metadata. Use user_id to enable Customer tracking in Treblle.')
+                ->end()
             ->end()
         ->end();
 

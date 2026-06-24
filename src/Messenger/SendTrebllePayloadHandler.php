@@ -10,7 +10,8 @@ final class SendTrebllePayloadHandler
 {
     public function __construct(
         private readonly TreblleClient $client,
-    ) {}
+    ) {
+    }
 
     public function __invoke(SendTrebllePayload $message): void
     {

@@ -4,14 +4,15 @@ declare(strict_types=1);
 
 namespace Treblle\Symfony\Payload;
 
-use Throwable;
-use Treblle\Symfony\Doctrine\QueryCollector;
-use Treblle\Symfony\Masking\DataMasker;
-use Treblle\Symfony\TreblleBundle;
-use Treblle\Symfony\DependencyInjection\TreblleConfiguration;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Throwable;
+use Treblle\Symfony\DependencyInjection\TreblleConfiguration;
+use Treblle\Symfony\Doctrine\QueryCollector;
+use Treblle\Symfony\Masking\DataMasker;
+use Treblle\Symfony\Metadata\MetadataRegistry;
+use Treblle\Symfony\TreblleBundle;
 
 final class PayloadBuilder
 {
@@ -21,7 +22,9 @@ final class PayloadBuilder
         private readonly TreblleConfiguration $configuration,
         private readonly DataMasker $masker,
         private readonly QueryCollector $queryCollector,
-    ) {}
+        private readonly MetadataRegistry $metadataRegistry,
+    ) {
+    }
 
     public function build(
         Request $request,
@@ -30,19 +33,30 @@ final class PayloadBuilder
         ?string $routePath,
         array $errors,
     ): array {
+        $metadata = array_merge(
+            $this->configuration->getMetadata(),
+            $this->metadataRegistry->all(),
+        );
+
+        $data = [
+            'server' => $this->buildServer(),
+            'language' => $this->buildLanguage(),
+            'request' => $this->buildRequest($request, $routePath),
+            'response' => $this->buildResponse($request, $response, $requestStartedAt, $errors),
+            'errors' => $errors,
+            'queries' => $this->queryCollector->all(),
+        ];
+
+        if ($metadata !== []) {
+            $data['metadata'] = $metadata;
+        }
+
         return [
             'sdk_token' => $this->configuration->getSdkToken(),
             'api_key' => $this->configuration->getApiKey(),
             'sdk' => TreblleBundle::SDK_NAME,
             'version' => TreblleBundle::SDK_VERSION,
-            'data' => [
-                'server' => $this->buildServer(),
-                'language' => $this->buildLanguage(),
-                'request' => $this->buildRequest($request, $routePath),
-                'response' => $this->buildResponse($request, $response, $requestStartedAt, $errors),
-                'errors' => $errors,
-                'queries' => $this->queryCollector->all(),
-            ],
+            'data' => $data,
         ];
     }
 

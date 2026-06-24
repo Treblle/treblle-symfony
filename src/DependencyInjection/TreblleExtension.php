@@ -44,6 +44,7 @@ final class TreblleExtension extends Extension implements PrependExtensionInterf
             '$excludedPaths' => (array) ($config['excluded_paths'] ?? []),
             '$ingressUrl' => $config['ingress_url'] ?? 'https://ingress.treblle.com',
             '$async' => (bool) ($config['async'] ?? false),
+            '$metadata' => (array) ($config['metadata'] ?? []),
         ]);
 
         $container->setDefinition(TreblleConfiguration::class, $definition);

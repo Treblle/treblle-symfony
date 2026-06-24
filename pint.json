@@ -29,7 +29,6 @@
         "concat_space": {
             "spacing": "one"
         },
-        "arrow_function_spaces": true,
         "strict_comparison": true,
         "no_superfluous_elseif": true,
         "no_useless_else": true,
