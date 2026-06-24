@@ -6,13 +6,6 @@ namespace Treblle\Symfony;
 
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
-use Throwable;
-use Treblle\Symfony\DependencyInjection\TreblleConfiguration;
-use Treblle\Symfony\Doctrine\QueryCollector;
-use Treblle\Symfony\Http\TreblleClientInterface;
-use Treblle\Symfony\Messenger\SendTrebllePayload;
-use Treblle\Symfony\Payload\PayloadBuilder;
-use Treblle\Symfony\Routing\PathMatcher;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -22,6 +15,14 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\RouterInterface;
+use Throwable;
+use Treblle\Symfony\DependencyInjection\TreblleConfiguration;
+use Treblle\Symfony\Doctrine\QueryCollector;
+use Treblle\Symfony\Http\TreblleClientInterface;
+use Treblle\Symfony\Messenger\SendTrebllePayload;
+use Treblle\Symfony\Metadata\MetadataRegistry;
+use Treblle\Symfony\Payload\PayloadBuilder;
+use Treblle\Symfony\Routing\PathMatcher;
 
 final class TreblleEventSubscriber implements EventSubscriberInterface
 {
@@ -41,8 +42,10 @@ final class TreblleEventSubscriber implements EventSubscriberInterface
         private readonly PathMatcher $pathMatcher,
         private readonly RouterInterface $router,
         private readonly QueryCollector $queryCollector,
+        private readonly MetadataRegistry $metadataRegistry,
         private readonly LoggerInterface $logger = new NullLogger(),
-    ) {}
+    ) {
+    }
 
     public function setMessageBus(object $messageBus): void
     {
@@ -204,6 +207,7 @@ final class TreblleEventSubscriber implements EventSubscriberInterface
         $this->response = null;
         $this->errors = [];
         $this->queryCollector->reset();
+        $this->metadataRegistry->reset();
     }
 
 }

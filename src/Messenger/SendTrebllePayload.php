@@ -8,5 +8,6 @@ final class SendTrebllePayload
 {
     public function __construct(
         public readonly array $payload,
-    ) {}
+    ) {
+    }
 }

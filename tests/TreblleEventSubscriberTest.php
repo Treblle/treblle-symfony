@@ -16,10 +16,11 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RouterInterface;
-use Treblle\Symfony\Doctrine\QueryCollector;
 use Treblle\Symfony\DependencyInjection\TreblleConfiguration;
+use Treblle\Symfony\Doctrine\QueryCollector;
 use Treblle\Symfony\Http\TreblleClientInterface;
 use Treblle\Symfony\Masking\DataMasker;
+use Treblle\Symfony\Metadata\MetadataRegistry;
 use Treblle\Symfony\Payload\PayloadBuilder;
 use Treblle\Symfony\Routing\PathMatcher;
 use Treblle\Symfony\TreblleEventSubscriber;
@@ -139,14 +140,16 @@ final class TreblleEventSubscriberTest extends TestCase
         );
 
         $queryCollector = new QueryCollector();
+        $metadataRegistry = new MetadataRegistry();
 
         return new TreblleEventSubscriber(
             configuration: $config,
             client: $this->client,
-            payloadBuilder: new PayloadBuilder($config, new DataMasker(), $queryCollector),
+            payloadBuilder: new PayloadBuilder($config, new DataMasker(), $queryCollector, $metadataRegistry),
             pathMatcher: new PathMatcher(),
             router: $this->router,
             queryCollector: $queryCollector,
+            metadataRegistry: $metadataRegistry,
         );
     }
 

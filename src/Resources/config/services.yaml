@@ -16,3 +16,5 @@ services:
     Treblle\Symfony\Routing\PathMatcher: ~
 
     Treblle\Symfony\Doctrine\QueryCollector: ~
+
+    Treblle\Symfony\Metadata\MetadataRegistry: ~

@@ -92,6 +92,7 @@ treblle:
     - creditScore
   excluded_paths: []          # Paths to skip (exact or wildcard)
   ingress_url: "https://ingress.treblle.com"  # Ingress endpoint
+  metadata: {}                # Key/Value metadata added to every request (user-id enables Customer Tracking)
 ```
 
 ### `sdk_token`
@@ -187,6 +188,24 @@ treblle:
   ingress_url: "https://ingress-eu.treblle.com"
 ```
 
+### `metadata`
+
+Key/Value metadata attached to every request. Useful for environment tags, region, tier, or any data you always want visible and searcable in Treblle.
+
+```yaml
+treblle:
+  metadata:
+    env: production
+    region: us-east-1
+    tier: enterprise
+```
+
+> **`user-id` is a reserved keyword.** When present in metadata, Treblle uses it to enable **Customer Tracking** — linking requests to individual users so you can filter, search, and analyse traffic per customer in the dashboard.
+
+See [Per-request metadata](#per-request-metadata) for adding dynamic values (e.g. the authenticated user's ID) at runtime.
+
+---
+
 ### `async`
 
 When `true`, the SDK dispatches payloads as Symfony Messenger messages instead of sending them inline. This moves the HTTP call to a background worker process, freeing your application immediately.
@@ -256,6 +275,45 @@ Run this as a supervised process (Supervisor, systemd, etc.) so it restarts auto
 **Fallback behaviour:**
 
 If `async: true` is set but `symfony/messenger` is not installed, the SDK silently falls back to the default synchronous send. No errors, no data loss - it just skips the queue.
+
+---
+
+## Per-request metadata
+
+Inject `MetadataRegistry` into any controller or service and call `add()` with an associative array. Values are merged with the globally defined metadata in YAML for that request only and cleared automatically after the response is sent.
+
+```php
+use Treblle\Symfony\Metadata\MetadataRegistry;
+
+final class OrderController extends AbstractController
+{
+    public function __construct(private readonly MetadataRegistry $treblle) {}
+
+    #[Route('/orders', methods: ['POST'])]
+    public function create(Request $request): JsonResponse
+    {
+        $this->treblle->add([
+            'user-id'  => $this->getUser()?->getId(),
+            'plan'     => 'enterprise',
+            'tenant'   => 'acme-corp',
+        ]);
+
+        // ... handle request
+    }
+}
+```
+
+Multiple calls within the same request are merged together:
+
+```php
+$this->treblle->add(['user-id' => 42]);
+$this->treblle->add(['plan' => 'pro']);
+// payload contains: { user-id: 42, plan: "pro" }
+```
+
+Runtime values take precedence over any static keys defined under `treblle.metadata` in your config — so you can set a sensible default in YAML and override it per-request when needed.
+
+> **Customer Tracking:** `user-id` is a reserved metadata keyword. When set, Treblle automatically links the request to that user in the dashboard, enabling per-customer traffic filtering, error tracking, and usage analysis.
 
 ---
 

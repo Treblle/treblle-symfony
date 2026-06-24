@@ -9,7 +9,9 @@ use Doctrine\DBAL\Driver\Middleware as MiddlewareInterface;
 
 final class TreblleMiddleware implements MiddlewareInterface
 {
-    public function __construct(private readonly QueryCollector $collector) {}
+    public function __construct(private readonly QueryCollector $collector)
+    {
+    }
 
     public function wrap(DriverInterface $driver): DriverInterface
     {

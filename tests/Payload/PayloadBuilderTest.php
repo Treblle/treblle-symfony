@@ -7,9 +7,10 @@ namespace Treblle\Symfony\Tests\Payload;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Treblle\Symfony\Doctrine\QueryCollector;
 use Treblle\Symfony\DependencyInjection\TreblleConfiguration;
+use Treblle\Symfony\Doctrine\QueryCollector;
 use Treblle\Symfony\Masking\DataMasker;
+use Treblle\Symfony\Metadata\MetadataRegistry;
 use Treblle\Symfony\Payload\PayloadBuilder;
 use Treblle\Symfony\TreblleBundle;
 
@@ -22,17 +23,19 @@ final class PayloadBuilderTest extends TestCase
         $this->builder = $this->makeBuilder();
     }
 
-    private function makeBuilder(array $maskedFields = []): PayloadBuilder
+    private function makeBuilder(array $maskedFields = [], array $configMetadata = [], ?MetadataRegistry $registry = null): PayloadBuilder
     {
         $config = new TreblleConfiguration(
             sdkToken: 'sdk-test-token',
             apiKey: 'api-test-key',
+            metadata: $configMetadata,
         );
 
         return new PayloadBuilder(
             configuration: $config,
             masker: new DataMasker($maskedFields),
             queryCollector: new QueryCollector(),
+            metadataRegistry: $registry ?? new MetadataRegistry(),
         );
     }
 
@@ -190,7 +193,7 @@ final class PayloadBuilderTest extends TestCase
         $collector = new QueryCollector();
         $collector->add('SELECT 1', 0.5);
 
-        $builder = new PayloadBuilder($config, new DataMasker(), $collector);
+        $builder = new PayloadBuilder($config, new DataMasker(), $collector, new MetadataRegistry());
         $payload = $builder->build(
             Request::create('/api/users', 'GET'),
             new Response('{}', 200, ['Content-Type' => 'application/json']),
@@ -201,5 +204,68 @@ final class PayloadBuilderTest extends TestCase
 
         $this->assertCount(1, $payload['data']['queries']);
         $this->assertSame('SELECT 1', $payload['data']['queries'][0]['sql']);
+    }
+
+    public function test_metadata_absent_when_empty(): void
+    {
+        $payload = $this->build(
+            Request::create('/api/users', 'GET'),
+            new Response('{}', 200, ['Content-Type' => 'application/json']),
+        );
+
+        $this->assertArrayNotHasKey('metadata', $payload['data']);
+    }
+
+    public function test_static_config_metadata_is_included(): void
+    {
+        $builder = $this->makeBuilder(configMetadata: ['env' => 'production', 'region' => 'us-east-1']);
+
+        $payload = $builder->build(
+            Request::create('/api/users', 'GET'),
+            new Response('{}', 200, ['Content-Type' => 'application/json']),
+            microtime(true),
+            null,
+            [],
+        );
+
+        $this->assertSame('production', $payload['data']['metadata']['env']);
+        $this->assertSame('us-east-1', $payload['data']['metadata']['region']);
+    }
+
+    public function test_runtime_metadata_is_included(): void
+    {
+        $registry = new MetadataRegistry();
+        $registry->add(['user_id' => 42, 'tenant' => 'acme']);
+
+        $builder = $this->makeBuilder(registry: $registry);
+
+        $payload = $builder->build(
+            Request::create('/api/users', 'GET'),
+            new Response('{}', 200, ['Content-Type' => 'application/json']),
+            microtime(true),
+            null,
+            [],
+        );
+
+        $this->assertSame(42, $payload['data']['metadata']['user_id']);
+        $this->assertSame('acme', $payload['data']['metadata']['tenant']);
+    }
+
+    public function test_runtime_metadata_overrides_config_metadata(): void
+    {
+        $registry = new MetadataRegistry();
+        $registry->add(['env' => 'staging']);
+
+        $builder = $this->makeBuilder(configMetadata: ['env' => 'production'], registry: $registry);
+
+        $payload = $builder->build(
+            Request::create('/api/users', 'GET'),
+            new Response('{}', 200, ['Content-Type' => 'application/json']),
+            microtime(true),
+            null,
+            [],
+        );
+
+        $this->assertSame('staging', $payload['data']['metadata']['env']);
     }
 }
